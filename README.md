@@ -31,7 +31,7 @@ Senza `PUBLIC_SANITY_PROJECT_ID` il sito usa `web/src/data/seed.json`, cioè i c
 ## Messa in funzione (una volta sola)
 
 1. **Sanity**: crea il progetto su sanity.io/manage e scrivi il suo Project ID in `studio/env.ts`. In *API → CORS origins* aggiungi gli indirizzi del sito (con "Allow credentials"). L'area riservata è dentro il sito, su `/admin`: non va pubblicata a parte.
-2. **Contenuti**: crea in *API → Tokens* un token *Editor*, mettilo su Vercel come `SANITY_WRITE_TOKEN` e apri `/api/importa` mentre il vecchio sito è ancora online (le foto si scaricano da lì). Poi aggiungi su Vercel `PUBLIC_SANITY_PROJECT_ID` perché il sito legga da Sanity invece che da `seed.json`.
+2. **Contenuti**: i contenuti del vecchio sito sono già stati importati in Sanity (ottobre 2026, con l'endpoint `/api/importa`, poi rimosso: è nella storia git se servisse di nuovo). Su Vercel `PUBLIC_SANITY_PROJECT_ID` fa leggere il sito da Sanity invece che da `seed.json`.
 3. **Vercel**: importa il repository, imposta *Root Directory* = `web` e aggiungi le variabili di `.env.example`. Crea un *Deploy Hook* e mettine l'indirizzo in `VERCEL_DEPLOY_HOOK_URL`.
 4. **Sanity → API**: crea un token con permessi di scrittura (`SANITY_WRITE_TOKEN`) e un webhook verso `https://presicceproloco.org/api/translate`, sui documenti `evento`, `stazione`, `pagina`, `impostazioni`, evento *publish*, con l'header `x-webhook-secret` uguale a `SANITY_WEBHOOK_SECRET`.
 5. **Anthropic**: crea una chiave API su console.anthropic.com e mettila in `ANTHROPIC_API_KEY`, con un limite di spesa mensile basso.
