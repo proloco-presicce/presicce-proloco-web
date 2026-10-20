@@ -43,11 +43,18 @@ async function importa() {
   const todo = docs.filter((d) => !existing.has(d._id));
 
   const created: string[] = [];
+  const skipped: string[] = [];
+  // Una foto che non si scarica più (es. presa da un altro sito) viene saltata, non blocca l'importazione.
+  const tryUpload = (img: SeedImage) =>
+    upload(client, img).catch((err: Error) => {
+      skipped.push(err.message);
+      return null;
+    });
   for (const doc of todo) {
     if (Date.now() - started > TIME_BUDGET_MS) break;
     const out: Doc = { ...doc };
-    if (Array.isArray(doc.immagini)) out.immagini = await Promise.all((doc.immagini as SeedImage[]).map((img) => upload(client, img)));
-    if (doc.immagine) out.immagine = await upload(client, doc.immagine as SeedImage);
+    if (Array.isArray(doc.immagini)) out.immagini = (await Promise.all((doc.immagini as SeedImage[]).map(tryUpload))).filter(Boolean);
+    if (doc.immagine) out.immagine = (await tryUpload(doc.immagine as SeedImage)) ?? undefined;
     await client.createIfNotExists(out);
     created.push(doc._id);
   }
@@ -58,6 +65,7 @@ async function importa() {
       `Documenti già presenti: ${existing.size}`,
       `Creati adesso: ${created.length}`,
       remaining ? `Ne mancano ${remaining}: ricarica questa pagina per continuare.` : 'Importazione completata.',
+      ...(skipped.length ? ['', 'Foto saltate:', ...skipped] : []),
     ].join('\n'),
   );
 }
