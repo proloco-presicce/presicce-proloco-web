@@ -4,14 +4,15 @@ import { itITLocale } from '@sanity/locale-it-it';
 import { evento } from './schemaTypes/evento';
 import { impostazioni, pagina, stazione } from './schemaTypes/contenuti';
 import { immagineConDidascalia, stringaLocalizzata, testoLocalizzato } from './schemaTypes/localized';
+import { dataset, projectId } from './env';
 
 const SINGLETONS = new Set(['impostazioni']);
 
 export default defineConfig({
   name: 'proloco-presicce',
   title: 'Pro Loco Presicce',
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID!,
-  dataset: process.env.SANITY_STUDIO_DATASET ?? 'production',
+  projectId,
+  dataset,
   plugins: [
     structureTool({
       // Menu dell'area riservata: gli eventi in cima, perché sono la cosa che si aggiorna più spesso.

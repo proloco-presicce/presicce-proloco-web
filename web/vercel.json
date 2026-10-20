@@ -1,8 +1,7 @@
 {
   "redirects": [
-    { "source": "/admin", "destination": "https://proloco-presicce.sanity.studio/", "permanent": false },
-    { "source": "/segnala-evento", "destination": "https://proloco-presicce.sanity.studio/", "permanent": true },
-    { "source": "/segnala-evento/", "destination": "https://proloco-presicce.sanity.studio/", "permanent": true },
+    { "source": "/segnala-evento", "destination": "/admin/", "permanent": true },
+    { "source": "/segnala-evento/", "destination": "/admin/", "permanent": true },
     { "source": "/eventi-cpt/:slug/", "destination": "/eventi/:slug/", "permanent": true },
     { "source": "/eventi-cpt/:slug", "destination": "/eventi/:slug/", "permanent": true },
     { "source": "/presepe-vivente/menu/", "destination": "/presepe-vivente/", "permanent": true },
