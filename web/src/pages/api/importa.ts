@@ -23,6 +23,15 @@ interface SeedImage {
 type Doc = Record<string, unknown> & { _id: string; _type: string };
 
 export const GET: APIRoute = async () => {
+  try {
+    return await importa();
+  } catch (err) {
+    const e = err as Error & { cause?: { code?: string; message?: string } };
+    return text(`Errore: ${e.message}${e.cause ? ` (${e.cause.code ?? e.cause.message})` : ''}`, 500);
+  }
+};
+
+async function importa() {
   const token = import.meta.env.SANITY_WRITE_TOKEN;
   if (!token) return text('Manca SANITY_WRITE_TOKEN nelle variabili di Vercel.', 500);
 
@@ -51,13 +60,15 @@ export const GET: APIRoute = async () => {
       remaining ? `Ne mancano ${remaining}: ricarica questa pagina per continuare.` : 'Importazione completata.',
     ].join('\n'),
   );
-};
+}
 
 /** Scarica un'immagine dal vecchio sito e la carica in Sanity (che scarta i doppioni da sola). */
 async function upload(client: ReturnType<typeof createClient>, img: SeedImage) {
   const { url, ...rest } = img;
   if (!url) return { ...rest, _type: 'immagineConDidascalia' };
-  const res = await fetch(url);
+  const res = await fetch(url).catch((err) => {
+    throw new Error(`Foto non scaricata: ${url} (${err.cause?.code ?? err.cause?.message ?? err.message})`);
+  });
   if (!res.ok) throw new Error(`Foto non scaricata (${res.status}): ${url}`);
   const asset = await client.assets.upload('image', Buffer.from(await res.arrayBuffer()), {
     filename: url.split('/').pop(),
