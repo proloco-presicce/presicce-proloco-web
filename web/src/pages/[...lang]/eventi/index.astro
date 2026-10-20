@@ -1,0 +1,31 @@
+---
+import Base from '../../../layouts/Base.astro';
+import EventCard from '../../../components/EventCard.astro';
+import { localePaths, type Locale } from '../../../i18n/config';
+import { t } from '../../../i18n/ui';
+import { getEventi, splitEventi } from '../../../lib/content';
+
+export const getStaticPaths = localePaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const tr = t(locale);
+const { prossimi, passati } = splitEventi(await getEventi());
+---
+
+<Base locale={locale} title={tr('navEvents')}>
+  <h1>{tr('upcomingEvents')}</h1>
+  {prossimi.length ? <div class="grid">{prossimi.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p>{tr('noEvents')}</p>}
+
+  {
+    passati.length > 0 && (
+      <>
+        <h2>{tr('pastEvents')}</h2>
+        <div class="grid past">{passati.map((evento) => <EventCard evento={evento} locale={locale} />)}</div>
+      </>
+    )
+  }
+</Base>
+
+<style>
+  .past { opacity: 0.75; }
+</style>

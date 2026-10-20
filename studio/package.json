@@ -1,0 +1,22 @@
+{
+  "name": "studio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sanity/icons": "5.2.3",
+    "@sanity/locale-it-it": "1.1.36",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "sanity": "6.17.0",
+    "styled-components": "6.5.3"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

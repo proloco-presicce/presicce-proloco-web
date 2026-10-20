@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import EventCard from '../../components/EventCard.astro';
+import BookingButtons from '../../components/BookingButtons.astro';
+import { localePaths, path, type Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
+import { getEventi, getImpostazioni, getStazioni, image, isFallback, markdown, pick, splitEventi } from '../../lib/content';
+
+export const getStaticPaths = localePaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const tr = t(locale);
+const impostazioni = await getImpostazioni();
+const { prossimi } = splitEventi(await getEventi());
+const inEvidenza = prossimi.filter((e) => e.inEvidenza !== false).slice(0, 3);
+const stazioni = (await getStazioni()).slice(0, 3);
+const hero = image(impostazioni.heroImmagine, locale, 1600);
+---
+
+<Base locale={locale} title={tr('siteName')} description={pick(impostazioni.heroTesto, locale)} autoTranslated={isFallback(impostazioni.heroTitolo, locale)}>
+  <section class="hero">
+    {hero && <img src={hero.src} alt={hero.alt} width="1600" height="900" fetchpriority="high" />}
+    <p class="eyebrow">{tr('tagline')}</p>
+    <h1>{pick(impostazioni.heroTitolo, locale)}</h1>
+    <div class="prose" set:html={markdown(impostazioni.heroTesto, locale)} />
+    <BookingButtons locale={locale} phone={impostazioni.telefono} whatsapp={impostazioni.whatsapp} />
+  </section>
+
+  <section>
+    <h2>{tr('upcomingEvents')}</h2>
+    {inEvidenza.length ? <div class="grid">{inEvidenza.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p>{tr('noEvents')}</p>}
+    <p><a href={path(locale, '/eventi/')}>{tr('allEvents')} →</a></p>
+  </section>
+
+  <section>
+    <h2>{tr('navNativity')}</h2>
+    <ul class="grid stops">
+      {stazioni.map((s) => (
+        <li class="card"><a class="card-body" href={path(locale, `/presepe-vivente/${s.slug.current}/`)}><strong>{pick(s.titolo, locale)}</strong><br />{pick(s.sottotitolo, locale)}</a></li>
+      ))}
+    </ul>
+    <p><a href={path(locale, '/presepe-vivente/')}>{tr('discover')} →</a></p>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-block: 1rem 2rem; }
+  .hero img { aspect-ratio: 16 / 9; object-fit: cover; width: 100%; margin-block-end: 1.5rem; }
+  .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
+  h1 { font-size: clamp(1.8rem, 6vw, 3rem); margin-block: 0.25rem 0.75rem; }
+  .stops { list-style: none; padding: 0; }
+  .stops a { display: block; color: inherit; text-decoration: none; }
+</style>

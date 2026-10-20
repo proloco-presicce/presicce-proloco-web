@@ -1,0 +1,34 @@
+---
+import { path, type Locale } from '../i18n/config';
+import { image, pick, type Evento } from '../lib/content';
+import { dateBadge } from '../lib/format';
+
+interface Props {
+  evento: Evento;
+  locale: Locale;
+}
+
+const { evento, locale } = Astro.props;
+const img = image(evento.immagine, locale, 800);
+const badge = dateBadge(evento.dataInizio, locale);
+---
+
+<article class="card event">
+  <a href={path(locale, `/eventi/${evento.slug.current}/`)}>
+    {img && <img src={img.src} alt={img.alt} loading="lazy" width="800" height="600" />}
+    <div class="card-body">
+      <p class="badge"><span>{badge.day}</span> {badge.month}</p>
+      <h3>{pick(evento.titolo, locale)}</h3>
+      {evento.luogo && <p class="place">{evento.luogo}</p>}
+    </div>
+  </a>
+</article>
+
+<style>
+  a { color: inherit; text-decoration: none; display: block; }
+  img { border-radius: 0; aspect-ratio: 4 / 3; object-fit: cover; width: 100%; }
+  .badge { margin: 0; color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+  .badge span { font-size: 1.4rem; }
+  h3 { margin: 0.25rem 0; }
+  .place { margin: 0; color: var(--muted); }
+</style>

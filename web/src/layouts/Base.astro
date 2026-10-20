@@ -1,0 +1,113 @@
+---
+// Layout di base. La grafica qui è provvisoria: verrà sostituita da quella fatta con Claude Design.
+// Usa solo proprietà CSS logiche (margin-inline, padding-block...) così l'arabo si gira da solo.
+import { defaultLocale, htmlLang, locales, path, rtlLocales, stripLocale, type Locale } from '../i18n/config';
+import { t } from '../i18n/ui';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import { getImpostazioni } from '../lib/content';
+import { telHref } from '../lib/format';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description?: string;
+  image?: string;
+  autoTranslated?: boolean;
+}
+
+const { locale, title, description = '', image, autoTranslated = false } = Astro.props;
+const tr = t(locale);
+const impostazioni = await getImpostazioni();
+const current = stripLocale(Astro.url.pathname);
+const canonical = new URL(path(locale, current), Astro.site);
+const fullTitle = title === tr('siteName') ? title : `${title} · ${tr('siteName')}`;
+const nav = [
+  { href: path(locale, '/'), label: tr('navHome') },
+  { href: path(locale, '/eventi/'), label: tr('navEvents') },
+  { href: path(locale, '/presepe-vivente/'), label: tr('navNativity') },
+  { href: '#contatti', label: tr('navContact') },
+];
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]} dir={rtlLocales.includes(locale) ? 'rtl' : 'ltr'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={new URL(path(l, current), Astro.site)} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(path(defaultLocale, current), Astro.site)} />
+    <meta property="og:title" content={fullTitle} />
+    {description && <meta property="og:description" content={description} />}
+    {image && <meta property="og:image" content={image} />}
+    <meta name="theme-color" content="#8a6a3b" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip</a>
+    <header class="site-header">
+      <a class="brand" href={path(locale, '/')}>{tr('siteName')}</a>
+      <nav aria-label="Menu">
+        <ul>{nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+      </nav>
+      <LanguageSwitcher locale={locale} />
+    </header>
+
+    <main id="main">
+      {autoTranslated && tr('autoTranslated') && <p class="notice">{tr('autoTranslated')}</p>}
+      <slot />
+    </main>
+
+    <footer class="site-footer" id="contatti">
+      <h2>{tr('contactUs')}</h2>
+      <p>{tr('contactText')}</p>
+      <ul class="contacts">
+        {impostazioni.telefono && <li><a href={telHref(impostazioni.telefono)}>{impostazioni.telefono}</a></li>}
+        {impostazioni.email && <li><a href={`mailto:${impostazioni.email}`}>{impostazioni.email}</a></li>}
+      </ul>
+      <p class="small">© {new Date().getFullYear()} Pro Loco Presicce</p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #faf6ef;
+    --surface: #ffffff;
+    --text: #2b2520;
+    --muted: #6b6158;
+    --accent: #8a6a3b;
+    --accent-ink: #ffffff;
+    --radius: 14px;
+    --gap: clamp(1rem, 3vw, 1.75rem);
+    font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  img { max-width: 100%; height: auto; display: block; border-radius: var(--radius); }
+  a { color: var(--accent); }
+  h1, h2, h3 { line-height: 1.2; }
+  main { max-width: 72rem; margin-inline: auto; padding: var(--gap); }
+  .skip { position: absolute; inset-inline-start: -999px; }
+  .skip:focus { inset-inline-start: 1rem; top: 1rem; background: var(--surface); padding: 0.5rem; }
+  .site-header { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: center; justify-content: space-between; padding: 0.75rem var(--gap); background: var(--surface); border-block-end: 1px solid #eadfcd; }
+  .brand { font-weight: 700; text-decoration: none; color: var(--text); }
+  .site-header ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; list-style: none; margin: 0; padding: 0; }
+  .site-header nav a { text-decoration: none; color: var(--text); padding-block: 0.5rem; display: inline-block; }
+  .notice { background: #f1e7d6; padding: 0.5rem 1rem; border-radius: var(--radius); color: var(--muted); font-size: 0.9rem; }
+  .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0.75rem 1.25rem; border-radius: 999px; background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600; }
+  .button.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+  .grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); }
+  .card { background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+  .card-body { padding: 1rem 1.25rem 1.25rem; }
+  .prose { max-width: 42rem; }
+  .site-footer { background: #2b2520; color: #f3ede4; padding: 2rem var(--gap); margin-block-start: 3rem; }
+  .site-footer a { color: #f3d9a8; }
+  .contacts { list-style: none; padding: 0; }
+  .small { font-size: 0.85rem; opacity: 0.8; }
+</style>

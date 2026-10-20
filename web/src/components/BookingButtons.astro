@@ -1,0 +1,29 @@
+---
+// Pulsanti per prenotare: il sito non vende nulla online, si prenota solo per telefono o WhatsApp.
+import type { Locale } from '../i18n/config';
+import { t } from '../i18n/ui';
+import { telHref, whatsappHref } from '../lib/format';
+
+interface Props {
+  locale: Locale;
+  phone?: string;
+  whatsapp?: string;
+  calendar?: string;
+}
+
+const { locale, phone, whatsapp, calendar } = Astro.props;
+const tr = t(locale);
+---
+
+<div class="booking">
+  {phone && <a class="button" href={telHref(phone)}>{tr('callToBook')}</a>}
+  {whatsapp && <a class="button secondary" href={whatsappHref(whatsapp)} rel="noopener">{tr('whatsapp')}</a>}
+  {calendar && <a class="button secondary" href={calendar} rel="noopener">{tr('addToCalendar')}</a>}
+</div>
+
+<style>
+  .booking { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-block: 1.5rem; }
+  @media (max-width: 30rem) {
+    .booking .button { flex: 1 1 100%; }
+  }
+</style>

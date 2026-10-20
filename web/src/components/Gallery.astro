@@ -1,0 +1,28 @@
+---
+import type { Image } from '../lib/content';
+
+interface Props {
+  images: Image[];
+}
+
+const { images } = Astro.props;
+---
+
+{
+  images.length > 0 && (
+    <div class="grid gallery">
+      {images.map((img) => (
+        <figure>
+          <img src={img.src} alt={img.alt} loading="lazy" width="1200" height="900" />
+          {img.caption && <figcaption>{img.caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .gallery { margin-block: 2rem; }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: 0.9rem; margin-block-start: 0.4rem; }
+</style>

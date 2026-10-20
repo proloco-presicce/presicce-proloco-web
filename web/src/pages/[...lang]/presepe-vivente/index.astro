@@ -1,0 +1,37 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Gallery from '../../../components/Gallery.astro';
+import { localePaths, path, type Locale } from '../../../i18n/config';
+import { t } from '../../../i18n/ui';
+import { getPagina, getStazioni, image, isFallback, markdown, pick, type Image } from '../../../lib/content';
+
+export const getStaticPaths = localePaths;
+
+const { locale } = Astro.props as { locale: Locale };
+const tr = t(locale);
+const intro = await getPagina('presepe-vivente');
+const stazioni = await getStazioni();
+const images = (intro?.immagini ?? []).map((i) => image(i, locale)).filter((i): i is Image => !!i);
+---
+
+<Base locale={locale} title={pick(intro?.titolo, locale) || tr('navNativity')} description={pick(intro?.sottotitolo, locale)} autoTranslated={isFallback(intro?.testo, locale)}>
+  <h1>{pick(intro?.titolo, locale) || tr('navNativity')}</h1>
+  {intro?.sottotitolo && <p class="subtitle">{pick(intro.sottotitolo, locale)}</p>}
+
+  <h2>{tr('stops')}</h2>
+  <ol class="stops">
+    {stazioni.map((s) => (
+      <li><a href={path(locale, `/presepe-vivente/${s.slug.current}/`)}><strong>{pick(s.titolo, locale)}</strong><span>{pick(s.sottotitolo, locale)}</span></a></li>
+    ))}
+  </ol>
+
+  {intro && <div class="prose" set:html={markdown(intro.testo, locale)} />}
+  <Gallery images={images} />
+</Base>
+
+<style>
+  .subtitle { color: var(--muted); font-size: 1.15rem; }
+  .stops { padding-inline-start: 1.5rem; display: grid; gap: 0.5rem; }
+  .stops a { display: flex; flex-direction: column; padding-block: 0.5rem; text-decoration: none; color: var(--text); min-height: 44px; }
+  .stops span { color: var(--muted); font-size: 0.95rem; }
+</style>

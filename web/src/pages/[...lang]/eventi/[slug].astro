@@ -1,0 +1,61 @@
+---
+import Base from '../../../layouts/Base.astro';
+import BookingButtons from '../../../components/BookingButtons.astro';
+import { langParam, locales, type Locale } from '../../../i18n/config';
+import { t } from '../../../i18n/ui';
+import { getEventi, getImpostazioni, image, isFallback, markdown, pick, type Evento } from '../../../lib/content';
+import { calendarHref, formatDate } from '../../../lib/format';
+
+export async function getStaticPaths() {
+  const eventi = await getEventi();
+  return locales.flatMap((locale) => eventi.map((evento) => ({ params: { lang: langParam(locale), slug: evento.slug.current }, props: { locale, evento } })));
+}
+
+const { locale, evento } = Astro.props as { locale: Locale; evento: Evento };
+const tr = t(locale);
+const impostazioni = await getImpostazioni();
+const titolo = pick(evento.titolo, locale);
+const img = image(evento.immagine, locale, 1200);
+const descrizione = pick(evento.descrizione, locale);
+
+// Dati strutturati schema.org: aiutano Google a mostrare l'evento nei risultati.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: titolo,
+  startDate: evento.dataInizio,
+  endDate: evento.dataFine,
+  eventStatus: 'https://schema.org/EventScheduled',
+  location: { '@type': 'Place', name: evento.luogo ?? 'Presicce', address: evento.luogo ?? 'Presicce (LE), Italia' },
+  image: img?.src,
+  description: descrizione.slice(0, 300),
+  organizer: { '@type': 'Organization', name: 'Pro Loco Presicce', url: 'https://presicceproloco.org' },
+};
+---
+
+<Base locale={locale} title={titolo} description={descrizione.slice(0, 160)} image={img?.src} autoTranslated={isFallback(evento.descrizione, locale)}>
+  <article class="prose">
+    <h1>{titolo}</h1>
+    <dl>
+      <dt>{tr('when')}</dt>
+      <dd>{formatDate(evento.dataInizio, locale, true)}{evento.dataFine && ` – ${formatDate(evento.dataFine, locale, true)}`}</dd>
+      {evento.luogo && <><dt>{tr('where')}</dt><dd>{evento.luogo}</dd></>}
+    </dl>
+    <BookingButtons
+      locale={locale}
+      phone={evento.telefono || impostazioni.telefono}
+      whatsapp={evento.whatsapp || impostazioni.whatsapp}
+      calendar={calendarHref(titolo, evento.dataInizio, evento.dataFine, evento.luogo)}
+    />
+    {img && <img src={img.src} alt={img.alt || titolo} width="1200" height="1600" />}
+    <div set:html={markdown(evento.descrizione, locale)} />
+  </article>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</Base>
+
+<style>
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; }
+  dt { font-weight: 600; color: var(--muted); }
+  dd { margin: 0; }
+  img { margin-block: 1.5rem; }
+</style>

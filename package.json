@@ -1,0 +1,23 @@
+{
+  "name": "presicce-proloco-web",
+  "private": true,
+  "workspaces": [
+    "web",
+    "studio"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w web",
+    "build": "npm run build -w web",
+    "studio": "npm run dev -w studio",
+    "extract": "node scripts/extract-wp.mjs",
+    "seed:sanity": "node scripts/seed-to-sanity.mjs"
+  },
+  "devDependencies": {
+    "linkedom": "0.18.13",
+    "turndown": "7.2.4"
+  },
+  "overrides": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}

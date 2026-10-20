@@ -1,0 +1,479 @@
+{
+  "impostazioni": {
+    "_id": "impostazioni",
+    "_type": "impostazioni",
+    "telefono": "+393406506421",
+    "whatsapp": "+393406506421",
+    "email": "ufficioturistico@prolocopresicce.it",
+    "heroTitolo": {
+      "_type": "stringaLocalizzata",
+      "it": "Vivi Presicce: eventi, tradizioni, ospitalità e molto altro"
+    },
+    "heroTesto": {
+      "_type": "testoLocalizzato",
+      "it": "Scopri il calendario culturale, le feste di paese e gli itinerari tra frantoi ipogei e corti storiche. Tour guidati, degustazioni e storytelling sull’olio: pianifica la tua visita nel cuore del Salento."
+    }
+  },
+  "pagine": [
+    {
+      "_id": "pagina-presepe-vivente",
+      "_type": "pagina",
+      "slug": {
+        "_type": "slug",
+        "current": "presepe-vivente"
+      },
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Presepe Vivente di Presicce"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Tra vicoli, corti e rioni del borgo antico"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## Benvenuto\n\nBenvenuto nel Presepe Vivente di Presicce. Quello che stai per attraversare non è uno spettacolo, ma un cammino dentro il borgo: tra pietra, freddo d’inverno e scorci che normalmente sfuggono allo sguardo. Qui la scena non copre i luoghi: li ascolta.\n\nAbbiamo scelto una bellezza essenziale: poche luci, nessun effetto speciale. Non per “mancanza”, ma per fedeltà al significato profondo della Natività: una nascita nella povertà, al gelo, in una grotta. La pietra, le ombre e la gente sono tutto ciò che serve.\n\nProcedi con lentezza: il protagonista è Presicce, con le sue viuzze, le corti e gli scorci che si aprono all’improvviso.\n\n## Il percorso\n\nIl presepe ha inizio da **Via Vespucci** e si snoda all’interno del centro storico, attraversando **Rione Padreterno** e **Rione Corciuli**. Costeggia **Palazzo Soronzi**, prosegue tra **Via Contea** e **Via Crudili**, seguendo il ritmo naturale del borgo.\n\nLungo il cammino è previsto un breve momento dedicato ai più piccoli: uno spazio di luce e meraviglia, **Il Villaggio di Babbo Natale**, con uno spettacolo luminoso offerto dall’**RIASOP**.\n\nIl percorso riprende da **Vico San Giorgio** e culmina con la **Natività nel Frantoio di Via Gramsci**, luogo simbolico di lavoro, fatica e rinascita.\n\nL’uscita dal presepe avviene sempre da **Via Gramsci**, in direzione **Piazza del Popolo**.\n\n## Indicazioni per la visita\n\n-   La durata del percorso è di circa **10–15 minuti**, ma ti invitiamo a viverlo senza fretta.\n-   Ogni tappa racconta un frammento di storia: fermati, osserva, ascolta.\n-   Rispetta gli ambienti e i figuranti: molte scene si svolgono in spazi antichi e delicati.\n-   Le fotografie sono consentite.\n-   Mantieni un comportamento rispettoso verso tutti i partecipanti.\n\nBuon cammino. L’incanto ha inizio tra la pietra del borgo e la semplicità di una luce discreta.\n\n## Come funziona il percorso\n\n**Regola fondamentale.**  \nNon toccare, spostare o nascondere i QR code. Sono parte integrante del percorso e del lavoro di e divulgazione del borgo. Il loro rispetto è un segno di attenzione verso la comunità e la memoria di Presicce.\n\n1.  Segui il cammino naturale del borgo e le indicazioni lungo le strade.\n2.  Scannerizza il QR per approfondire storia, luoghi e dettagli\n3.  Ora dirigiti alla prima tappa: **IL CENSIMENTO**.  \n    Lo scriba ti sta aspettando: **registrati con nome e cognome** e lascia traccia del tuo passaggio nel borgo."
+      },
+      "immagini": []
+    }
+  ],
+  "stazioni": [
+    {
+      "_id": "stazione-palazzo-adamo-izzo",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "palazzo-adamo-izzo"
+      },
+      "ordine": 1,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Palazzo Adamo-Izzo"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "XVI secolo: il palazzo del notaio e l’eleganza sobria del centro storico"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia\n\n**Palazzo Adamo-Izzo** è indicato tra i palazzi storici di Presicce con origine nel **XVI secolo**. Una fonte legata alla storia della famiglia Adamo colloca la costruzione del palazzo in **via Amerigo Vespucci** e la attribuisce al **notaio Giacomo Adamo**, figura che rimanda a una Presicce già organizzata, con una borghesia locale capace di investire in architettura e terreni.\n\nUn palazzo, qui, non va letto come “lusso”: va letto come **struttura sociale**. Portale, androne, corte interna: sono un linguaggio. Dicono “famiglia”, “lavoro”, “relazioni”, ma dentro lo stesso paese in cui, a pochi metri, le corti raccontano la vita essenziale. Il presepe vivente sfrutta questa coesistenza: la Natività parla sia alla casa umile sia alla dimora signorile, perché nasce per ribaltare le gerarchie: la grandezza non sta nello sfarzo, ma nell’accoglienza.\n\nOsserva la pietra: i segni del tempo non sono un problema da mascherare, sono ciò che rende credibile il racconto. Qui “pochi fronzoli” non è povertà scenica: è fedeltà al senso.\n\nSuggerimento: guarda l’androne come fosse una soglia teatrale naturale. Il borgo fa regia senza bisogno di trucchi."
+      },
+      "immagini": [
+        {
+          "_key": "izzoe110f1d9",
+          "_type": "immagineConDidascalia",
+          "url": "https://www.comune.presicce.le.it/media/zoo/images/izzo_e110f1d96fc8f2a8a11bbb233a99c55e.jpg",
+          "alt": "Palazzo Adamo-Izzo a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-piazzetta-padreterno",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "piazzetta-padreterno"
+      },
+      "ordine": 2,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Piazzetta Padreterno"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Una soglia di silenzio dove il borgo prega con la pietra"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia\n\nQuesta piazzetta prende il nome dalla **colonna votiva del Padreterno**, che da secoli veglia sul rione. La scultura raffigura **Dio Padre benedicente**, con **globo** e **croce**, circondato da cherubini: un’immagine severa e protettiva, pensata per “stare in strada” e ricordare a chi passa che qui, prima ancora delle case, viene la comunità. La scheda del patrimonio culturale colloca l’opera **tra la seconda metà del Seicento e la fine del Seicento** (post 1600 – ante 1699).\n\nNon è un dettaglio ornamentale: è un **segno di orientamento**. Nel Salento, molte colonne e “pietrefitte” (osanne) nascono come punti di ritrovo e devozione popolare, legati anche ai riti di comunità. Qui, il presepe vivente trova una cornice perfetta: niente scenografie “imposte”, perché lo spazio è già _carico di senso_.\n\nLe superfici consumate, le irregolarità, le ombre naturali non sono difetti: sono la prova che questo luogo è vissuto. E proprio per questo la Natività, qui, sembra possibile."
+      },
+      "immagini": [
+        {
+          "_key": "iccd47579361",
+          "_type": "immagineConDidascalia",
+          "url": "https://www.sigecweb.beniculturali.it/images/fullsize/ICCD50007135/ICCD4757936_174936D.jpg",
+          "alt": "Colonna del Padreterno a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-case-a-corte",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "case-a-corte"
+      },
+      "ordine": 3,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Le case a corte"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Dal Cinquecento: vicinanza, acqua condivisa, vita in comune"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia\n\nA Presicce le **case a corte** non sono un “tema turistico”: sono un modo di abitare nato per necessità e diventato identità. Le fonti storiche locali descrivono queste corti come nuclei di abitazioni umili, spesso di **uno o due vani** con cantina, raccolte intorno a uno spazio scoperto dove si svolgevano le attività domestiche. In molte corti non mancano mai due elementi: **il pozzo** e **la pila** (lavatoio in pietra). A Presicce la diffusione di queste corti è ricondotta in particolare al **Cinquecento**.\n\nLa corte era una “casa allargata”: qui si impastava, si aggiustava, si raccontava la giornata; si cresceva insieme. Per questo, nel presepe vivente, la corte è già scena: basta poco e tutto torna credibile. Una luce bassa, un gesto di lavoro, un profumo di forno. La scelta di non coprire gli spazi con effetti speciali è coerente: **la povertà cristiana** della Natività vive bene dove la vita è stata realmente essenziale.\n\nAnche ciò che “non è perfetto” (una parete segnata, un’aggiunta moderna) diventa valore: racconta continuità, non finzione. Il borgo resta protagonista."
+      },
+      "immagini": [
+        {
+          "_key": "caseacortepr",
+          "_type": "immagineConDidascalia",
+          "url": "https://www.presicce-acquarica.it/wp-content/uploads/case-a-corte-presicce-01.jpg",
+          "alt": "Casa a corte nel centro storico di Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-rione-corciuli",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "rione-corciuli"
+      },
+      "ordine": 4,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Rione Corciuli"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Una corte lunghissima, doppio accesso: il vicolo che guida il cammino"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia\n\nIl **Rione Corciuli** è uno dei luoghi-simbolo delle “case a corte” presiccesi: una corte **particolarmente lunga**, con **doppio accesso** (dal rione Soronzi e dal rione Padreterno), caratterizzata da un **vicolo strettissimo** che sembra disegnato apposta per farti rallentare.\n\nQui il presepe vivente funziona per natura: il percorso “in fila” diventa racconto, perché cammini e intanto intravedi scene, dettagli, persone. È un’idea antica: la strada come luogo di relazione. E infatti ogni pietra è consumata nel modo giusto — non è usura, è memoria.\n\nSe noti qualche asimmetria, un intonaco che salta, una riparazione: non pensarlo come difetto. Il presepe qui non cerca la perfezione scenica; cerca la verità di un borgo reale. La Natività, nata in una grotta, al freddo, parla più forte in un luogo che non finge di essere altro.\n\nConsiglio: percorri il rione da entrambi i lati e sensi. Capirai perché la lentezza è parte dell’esperienza."
+      },
+      "immagini": [
+        {
+          "_key": "cortecorciul",
+          "_type": "immagineConDidascalia",
+          "url": "https://presicceproloco.org/assets/images/corte_corciuli.jpg",
+          "alt": "Rione Corciuli a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-corte-soronzi",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "corte-soronzi"
+      },
+      "ordine": 5,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Corte Soronzi (Palazzo Pepe)"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Tra XVI e XVII secolo: un palazzo, una corte, un’economia d’olio e fatica"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia\n\nQuella che i presiccesi chiamano **Corte Soronzi (o Suronzi)** è legata a **Palazzo Pepe**. Le fonti locali ricordano che nel **Seicento** la dimora apparteneva alla **famiglia Pepe**, indicata come **di origini fiorentine** e proprietaria di risorse agricole e produttive (mulino, frantoio, uliveti): un microcosmo economico tipico del Salento dell’olio.\n\nAnche le schede di divulgazione monumentale collocano l’edificio nel nucleo antico tra **XVI e XVII secolo**, con un portale d’ingresso di pregio e un balcone soprastante: elementi che raccontano un’epoca in cui il palazzo era segno di status, ma la corte restava spazio di vita quotidiana.\n\nNel corso dell’Ottocento la proprietà cambiò e si frammentò: ed è qui che la corte diventa ancora più interessante, perché si trasforma da “dimora di una famiglia” a luogo condiviso, attraversato, vissuto. Questo è il motivo per cui, durante il presepe vivente, la corte regge benissimo anche senza eccessi: le sue pietre hanno già “registrato” secoli di voci.\n\nNon cercare l’effetto: cerca i dettagli del portale, le ombre nell’androne, il passaggio tra pubblico e privato. È lì che il borgo diventa protagonista."
+      },
+      "immagini": [
+        {
+          "_key": "cortesoronzi",
+          "_type": "immagineConDidascalia",
+          "url": "https://presicceproloco.org/assets/images/corte_soronzi.jpg",
+          "alt": "Corte Soronzi (Palazzo Pepe) a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-mascarani",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "mascarani"
+      },
+      "ordine": 6,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "I Mascarani di Presicce"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Una leggenda, una notte del 1655 e un soprannome che è diventato identità"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia (tra mito e archivi)\n\nA Presicce “**Mascarani**” significa letteralmente **mascherati**. È un soprannome antico, nato da una vicenda che, nel racconto popolare, ha il sapore del teatro e della ribellione. La tradizione parla di un principe crudele e di un paese costretto a chinare la testa: una storia che nei secoli è stata legata perfino al famigerato _ius primae noctis_.\n\nMa proprio qui sta la parte più interessante: gli storici locali considerano **poco credibile** che quello “ius” sia davvero esistito in quel modo. Il racconto, piuttosto, sembra nascere come **denuncia del feudalesimo** e delle sue prepotenze, un’immagine simbolica più che un fatto documentato. In altre parole: la leggenda non parla solo di sesso e scandalo, ma di **potere**, di rapporti sociali e di una comunità che, per spiegarsi, ha trasformato la paura in racconto.\n\nUn punto però è netto: la morte del principe. Si sa infatti, che il Principe morì la notte del **5 novembre 1655**, con una formula d’archivio che parla di **morte violenta** e di sepoltura nel Monastero della Madonna degli Angeli. Il cuore della storia, quindi, resta: un delitto che diventa memoria collettiva. E nella memoria, l’assassino è **un uomo mascherato**. Da qui: “Mascarani”.\n\nOggi quel nome non è un’offesa: è un segno identitario. Racconta un paese che ha imparato a custodire il proprio passato senza paura di guardarlo negli occhi."
+      },
+      "immagini": [
+        {
+          "_key": "290517051234",
+          "_type": "immagineConDidascalia",
+          "url": "https://www.e-borghi.com/wp-content/uploads/2024/06/29_05_17-05_12_34-sa9bbb43b27a6fea333049e66916c022.jpg",
+          "alt": "Presicce - Mascarani",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-via-crudili",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "via-crudili"
+      },
+      "ordine": 7,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Via Crudili"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Accoglienza, confraternite e memoria civile del borgo"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## Un rione legato all’accoglienza\n\nNel rione **Crudili** viene ricordato un luogo di ospitalità: l’**Ospizio dei Pellegrini**, costituito da **due stanze** e donato dalla **famiglia Pepi**. Era destinato ad accogliere _pellegrini di riguardo_ che attraversavano il territorio, offrendo riparo e assistenza lungo i percorsi di devozione e viaggio.\n\nIn una tappa come questa, il presepe non racconta solo scene: racconta una comunità che sapeva prendersi cura.\n\n## Confraternite e opere pie\n\nLa vita religiosa e sociale del paese era sostenuta anche dalle **confraternite**. Tra queste, la confraternita del **SS. Sacramento** svolgeva un ruolo importante: sostegno ai bisognosi, aiuti concreti e attenzione alle pratiche di solidarietà.\n\nAlle confraternite veniva attribuito anche il merito dei **piccoli prestiti a basso tasso** concessi ai confratelli in caso di necessità, oltre a garantire, alla morte, un **solenne funerale** e una **degna sepoltura**.\n\n## Uno sguardo alla storia del Settecento\n\nLe fonti ricordano inoltre le tensioni legate alla redazione del **catasto**: nei primi mesi del **1745**, dopo la compilazione, il sindaco **Pasquale Martano** fu rovesciato dal potere, con accuse di irregolarità che coinvolsero anche i fratelli sacerdoti **D. Ippazio** e **D. Antonio**.\n\nSeguì una fase difficile e controversa: si dimise anche **Pasquale Montano** e fu eletto **Giulio Cesare Montano**, che portò faticosamente il lavoro a termine. L’episodio creò forte clamore e divisioni nella comunità."
+      },
+      "immagini": [
+        {
+          "_key": "viacrudilijp",
+          "_type": "immagineConDidascalia",
+          "url": "https://presicceproloco.org/assets/images/via_crudili.jpg",
+          "alt": "Via Crudili - Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-vico-san-giorgio",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "vico-san-giorgio"
+      },
+      "ordine": 8,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Vico San Giorgio"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Porta Urbis e le soglie antiche del borgo"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "Il testo che segue è tratto dalla ricerca di **Marta Viola** sui resti di Porta Urbis e sulla memoria contadina di Vico San Giorgio.\n\n“Porta Urbis” realizzata nel XVI secolo è ubicata alla fine di Vico San Giorgio sul retro di Casa Turrita (un edificio che unisce in sé la durezza di una fortezza e la raffinatezza di un’abitazione gentilizia), una porta cittadina, parte di una cerchia muraria che circondava il centro abitato, una costruzione in forma di passaggio che permetteva l’accesso al Borgo di Presicce.\n\nNel Seicento e nel Settecento, con il progredire del progetto d’ingrandimento del borgo, al pari delle mura, cadde definitivamente in disuso mantenendo nel tempo una valenza simbolica e una traccia del vissuto di una comunità. Le opere di fortificazione sono la testimonianza della potenza della città e delle attitudini del suo Principe nel difenderla.\n\nIn Italia e in tutto l’Occidente le porte cittadine erano poste sotto la protezione dell’Arcangelo o della Vergine e si costruiva nelle immediate vicinanze o una cappella o un’edicola votiva. Oggi è solo visibile una parte della Porta Urbis mentre la cappella di San Giorgio è andata completamente distrutta.\n\n_NB._ Molte di queste cappelle sono scomparse da secoli. La cappella San Giorgio trovasi nella via omonima in fondo ad un vicolo cieco (Carmelo Sigliuzzo).\n\nI resti di quest’antica struttura sotto la protezione di San Giorgio, sono la testimonianza di una florida Comunità Agricola che un tempo legava armoniosamente spiritualità, tradizione e rispetto per le risorse della natura.\n\nInfatti il nome greco del santo, **Giorgios**, significa che lavora la terra, agricoltore, protettore dell’agricoltura e invocato contro la siccità.\n\n“Aprile è il mese lungo e sottile: si seguono gli innesti nel loro sviluppo, si lotta contro le erbe infestanti. È il mese della semina dei legumi e del trapianto delle piantine dal semenzaio in terreno aperto (pomodori, fagiolo e così via). Acqua di San Giorgio (23 aprile) carestia dei fichi!”\n\n_NB._ Tratto da **Civiltà e vita Contadina**.\n\nPer comprendere la vita popolare, la storia e la tradizione di un popolo bisogna entrare nel borgo, esaminare i riti e visitare i luoghi dove si conserva e si valorizza la memoria dell’antico mondo contadino perché i valori e le conoscenze di un territorio e della sua gente non vadano persi.\n\nImportante la visita al **Museo della Civiltà Contadina** che accoglie numerosi oggetti della vita quotidiana e del lavoro agricolo ed artigianale della civiltà contadina del Borgo di Presicce.\n\n**Marta Viola**"
+      },
+      "immagini": [
+        {
+          "_key": "vicosangiorg",
+          "_type": "immagineConDidascalia",
+          "url": "https://presicceproloco.org/assets/images/vico_san_giorgio_oggi.jpg",
+          "alt": "Vico San Giorgio - Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Il Vico oggi"
+          }
+        },
+        {
+          "_key": "sgeorgiusjpg",
+          "_type": "immagineConDidascalia",
+          "url": "https://presicceproloco.org/assets/images/S.Georgius.jpg",
+          "alt": "San Giorgio - iconografia",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "S. Georgius"
+          }
+        },
+        {
+          "_key": "portaurbisjp",
+          "_type": "immagineConDidascalia",
+          "url": "https://presicceproloco.org/assets/images/PortaUrbis.jpg",
+          "alt": "Resti di Porta Urbis - Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Resti di Porta Urbis"
+          }
+        },
+        {
+          "_key": "vicosangiorg",
+          "_type": "immagineConDidascalia",
+          "url": "https://presicceproloco.org/assets/images/vico_san_giorgio.jpg",
+          "alt": "Vico San Giorgio - Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": ""
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-frantoi-ipogei",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "frantoi-ipogei"
+      },
+      "ordine": 9,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "I frantoi ipogei"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "XI–XIII secolo e oltre: una città sotterranea nata dall’olio"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia\n\nPresicce è conosciuta come **“Città degli Ipogei”** perché sotto i vicoli e le piazze esiste un’altra città: i **frantoi ipogei** (trappeti), scavati nella roccia per produrre olio in un ambiente stabile, protetto e “perfetto” per il lavoro invernale. Le fonti storiche riconducono la diffusione di questi frantoi a grotta già tra **XI e XIII secolo**, poi consolidati e sfruttati per secoli con un’intensità crescente.\n\nLa scelta del sottosuolo non era romantica: era **tecnica**. Sotto terra la temperatura resta più costante, l’olio si conserva meglio e l’attività può proseguire senza le difficoltà del freddo e delle intemperie. Inoltre, scavare nella roccia era spesso più accessibile che costruire grandi strutture in superficie: nacque così un’“industria” invisibile, ma decisiva per l’economia del territorio.\n\nA Presicce se ne contavano **23**; oggi una parte è visitabile e, sotto la piazza principale, si sviluppa un complesso straordinario: **8 frantoi collegati tra loro** da cunicoli, per un’area di circa **mille metri quadrati**. Non è un singolo ambiente: è un **dedalo** con stanze di lavoro, depositi, vasche e passaggi, come una piccola “città sotterranea” costruita attorno all’olio.\n\n### Come funzionava un frantoio ipogeo\n\nIl ciclo iniziava con la **molitura**: le olive venivano versate nella vasca di frangitura e una grande **macina in pietra** girava senza sosta, spesso trainata da un **mulo** (a volte bendato, per mantenerlo docile e costante). La pasta ottenuta veniva poi raccolta e preparata per il passaggio più delicato.\n\nSeguiva la **pressatura**. La pasta d’olive veniva distribuita nei **fiscoli** (dischi intrecciati, impilati), quindi compressa con **torchi** che “spremevano” lentamente. Da lì usciva un liquido denso, un miscuglio di olio e acqua di vegetazione, convogliato verso vasche e pozzetti di raccolta.\n\nInfine arrivava la **separazione**: per **decantazione** l’olio tendeva a emergere e veniva recuperato e travasato in grandi recipienti (orci, dolii, capasoni), pronto per essere conservato o venduto. Ogni gesto era ripetuto per ore: un lavoro di precisione, ma anche di resistenza, dentro umidità e odori forti.\n\n### Vita di ciurma: lavoro, turni, buio\n\nQui sotto si lavorava soprattutto nei mesi della raccolta, con turni lunghi e ritmi durissimi. Le testimonianze locali ricordano che i gruppi di lavoro venivano chiamati **“ciurma”** e il capo **“nachiro”**, parole prese dal lessico marinaro: come su una nave, ognuno aveva un ruolo e una disciplina, e si “navigava” nel buio, guidati dall’esperienza e dalla fatica.\n\nÈ facile immaginare la scena: pietra bagnata, passi lenti, la macina che gira, il respiro dell’animale, il rumore del torchio, le lampade accese. Un luogo così ti fa capire che l’olio non era solo un alimento: era **energia**, lavoro, commercio, sopravvivenza.\n\n### L’olio lampante: la luce dell’Europa\n\nUna parte importante della produzione salentina era **olio lampante**: non destinato alla tavola, ma all’uso “industriale”. Per secoli questo olio ha illuminato case, botteghe e strade: veniva acquistato all’estero per l’**illuminazione**, per la **lavorazione della lana** e per la produzione di **sapone**.\n\nNel Settecento la filiera pugliese raggiunse un picco: le fonti riportano che una quota enorme dell’olio esportato era proprio lampante, e il porto di **Gallipoli** divenne uno snodo europeo, con navi dirette verso grandi città come **Londra** e **Parigi**. Presicce, con la sua rete di frantoi, faceva parte di questa economia dell’“oro verde”: un lavoro sotterraneo che, fuori, portava ricchezza, scambi e identità.\n\nNel presepe vivente questa tappa è un simbolo potente: la Natività nasce nella roccia, nel freddo, nella semplicità. E qui la pietra non imita: è vera. Camminare sopra questi ipogei significa camminare sulla storia concreta di Presicce."
+      },
+      "immagini": [
+        {
+          "_key": "presicce3jpg",
+          "_type": "immagineConDidascalia",
+          "url": "https://i0.wp.com/www.primopiano.info/wp-content/uploads/2018/12/Presicce_3.jpg?resize=1020%2C580&ssl=1",
+          "alt": "Frantoi ipogei di Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagine"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-palazzo-lia-valentini",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "palazzo-lia-valentini"
+      },
+      "ordine": 10,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Palazzo Lia e Palazzo Valentini"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Due facciate, due famiglie, un’unica storia: la Presicce “signorile” che resta dentro il borgo"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## La storia\n\nDurante il percorso, Presicce cambia tono senza cambiare anima: accanto alle corti e ai vicoli più popolari compaiono i palazzi della **borghesia e della nobiltà locale**. Qui la pietra è la stessa, ma il linguaggio architettonico diventa più “ordinato”: facciate più simmetriche, logge, balconi, stemmi. Non è un contrasto che divide: è un intreccio. Perché in un borgo vero, il quotidiano e il prestigio hanno sempre camminato sulla stessa strada.\n\n**Palazzo Valentini** (via Gramsci) porta con sé segni araldici precisi: sulla facciata sono ricordati **due stemmi**, uno al piano inferiore attribuito ai **Castromediani di Limburg** e uno al piano superiore alla **famiglia Grezio**. Si ricorda anche un dato importante: i Grezio risultano stabiliti a Presicce **intorno alla metà del XVI secolo**. È un dettaglio che “ancora” il palazzo nel tempo, e racconta il radicamento di famiglie che hanno inciso sull’identità urbana del paese, tra proprietà terriere, amministrazione e relazioni sociali.\n\n**Palazzo Lia** (all’inizio di via Gramsci) è invece un esempio di architettura più “borghese” e teatrale: una facciata che colpisce per la **loggia centrale** e una certa ricerca di simmetria. Si ricorda inoltre, l’acquisto da parte di **Salvatore Lia**, che lo rilevò da **Giacomo Ricchiuti di Morciano di Leuca**. Anche qui, più che la singola data, è importante la trasformazione: la casa cambia proprietà, cambia funzioni, si adatta — come fa il borgo, sempre. Non tutto è “perfetto”, non tutto è rimasto identico: ed è proprio questa continuità viva che rende credibile l’atmosfera del presepe.\n\nConsiglio: guarda questi palazzi come “cornici” e non come monumenti. Sono parte del percorso perché Presicce, non interpreta un’epoca: racconta se stessa."
+      },
+      "immagini": [
+        {
+          "_key": "gino0007jpg",
+          "_type": "immagineConDidascalia",
+          "url": "https://www.comune.presicce.le.it/images/monumenti/GINO0007.jpg",
+          "alt": "Palazzo Valentini a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagini"
+          }
+        },
+        {
+          "_key": "gino00082b25",
+          "_type": "immagineConDidascalia",
+          "url": "https://www.comune.presicce.le.it/media/zoo/images/GINO0008_2b25ebe82224d1b4731db0f35af0ba38.jpg",
+          "alt": "Palazzo Lia a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagini"
+          }
+        }
+      ]
+    },
+    {
+      "_id": "stazione-santandrea-e-chiesa-madre",
+      "_type": "stazione",
+      "slug": {
+        "_type": "slug",
+        "current": "santandrea-e-chiesa-madre"
+      },
+      "ordine": 11,
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Sant’Andrea e Chiesa Madre"
+      },
+      "sottotitolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Cenni storici per entrare nel presepe con lo sguardo giusto"
+      },
+      "testo": {
+        "_type": "testoLocalizzato",
+        "it": "## Un primo sguardo su Presicce\n\nPrima di addentrarti nei vicoli del Presepe Vivente, vale la pena fermarsi un attimo su ciò che tiene insieme questo paese: la **devozione comunitaria**, la **piazza** come luogo di incontro, e la **Chiesa Madre** come memoria viva.\n\nLa **Colonna di Sant’Andrea**, dedicata al **Santo Patrono**, è uno dei segni più riconoscibili di Presicce. Secondo le fonti locali, risale ai **primi anni del Settecento** e venne voluta dalla famiglia dei **principi Bartilotti**. È un linguaggio barocco pensato per stare in piazza: alto, visibile, fatto per ricordare che la fede qui non è solo intima, ma anche **comunitaria**.\n\nAccanto, la **Chiesa Madre di Sant’Andrea Apostolo** racconta una storia di ferite e rinascita. Le fonti ricordano che l’antica parrocchiale venne distrutta dal **terremoto del 1743** e che la chiesa attuale fu ricostruita **tra il 1778 e il 1781** con il contributo della comunità. Il **campanile rinascimentale** (metà **XVI secolo**) resta come strato più antico: a Presicce il tempo non cancella, stratifica.\n\nTieni a mente questi segni: tra poco, nel **Rione Padreterno**, ritroverai lo stesso linguaggio di pietra e devozione — tra colonna, alleluia e memorie che arrivano “dalla vecchia chiesa”."
+      },
+      "immagini": [
+        {
+          "_key": "colonnadisan",
+          "_type": "immagineConDidascalia",
+          "url": "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1b/0a/1d/74/colonna-di-sant-andrea.jpg?w=1000&h=-1&s=1",
+          "alt": "Colonna di Sant’Andrea a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagini"
+          }
+        },
+        {
+          "_key": "960pxchiesam",
+          "_type": "immagineConDidascalia",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Chiesa_madre_di_sant%27Andrea_Presicce.jpg/960px-Chiesa_madre_di_sant%27Andrea_Presicce.jpg",
+          "alt": "Chiesa Madre di Sant’Andrea Apostolo a Presicce",
+          "didascalia": {
+            "_type": "stringaLocalizzata",
+            "it": "Immagini"
+          }
+        }
+      ]
+    }
+  ],
+  "eventi": [
+    {
+      "_id": "evento-viaggio-organizzato-a-pompei",
+      "_type": "evento",
+      "slug": {
+        "_type": "slug",
+        "current": "viaggio-organizzato-a-pompei"
+      },
+      "titolo": {
+        "_type": "stringaLocalizzata",
+        "it": "Viaggio organizzato a Pompei"
+      },
+      "dataInizio": "2025-10-12T00:00:00+02:00",
+      "luogo": "Pompei",
+      "descrizione": {
+        "_type": "testoLocalizzato",
+        "it": "PROGRAMMA VIAGGIO DEL 12 Ottobre 2025\n\nPartenza ore 00:00 da Presicce con Bus Gran Turismo. Arrivo in mattinata a Pompei.\n\nVisita libera del Santuario e visita con ingresso prenotato negli Scavi di Pompei.\n\nPranzo autogestito o in ristorante prenotato su richiesta.\n\nRitorno nelle prime ore del pomeriggio con arrivo a Presicce in serata.\n\nExtra e riduzioni:\n\n€20,00 pranzo in ristorante convenzionato.  \nPossibilità di riduzione per bambini e ragazzi fino a 25 anni."
+      },
+      "immagine": {
+        "url": "https://presicceproloco.org/wp-content/uploads/2025/09/IMG-20250920-WA0034.jpg",
+        "alt": ""
+      }
+    }
+  ]
+}
