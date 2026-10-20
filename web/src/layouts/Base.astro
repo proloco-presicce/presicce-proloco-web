@@ -13,9 +13,10 @@ interface Props {
   description?: string;
   image?: string;
   autoTranslated?: boolean;
+  noindex?: boolean;
 }
 
-const { locale, title, description = '', image, autoTranslated = false } = Astro.props;
+const { locale, title, description = '', image, autoTranslated = false, noindex = false } = Astro.props;
 const tr = t(locale);
 const impostazioni = await getImpostazioni();
 const current = stripLocale(Astro.url.pathname);
@@ -24,7 +25,8 @@ const fullTitle = title === tr('siteName') ? title : `${title} · ${tr('siteName
 const nav = [
   { href: path(locale, '/'), label: tr('navHome') },
   { href: path(locale, '/eventi/'), label: tr('navEvents') },
-  { href: path(locale, '/presepe-vivente/'), label: tr('navNativity') },
+  // Il Presepe Vivente compare nel menu solo nel periodo di Natale (interruttore nelle impostazioni).
+  ...(impostazioni.presepeAttivo ? [{ href: path(locale, '/presepe-vivente/'), label: tr('navNativity') }] : []),
   { href: '#contatti', label: tr('navContact') },
 ];
 ---
@@ -36,6 +38,7 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     {locales.map((l) => <link rel="alternate" hreflang={htmlLang[l]} href={new URL(path(l, current), Astro.site)} />)}
     <link rel="alternate" hreflang="x-default" href={new URL(path(defaultLocale, current), Astro.site)} />

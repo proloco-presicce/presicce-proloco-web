@@ -2,6 +2,7 @@
   "impostazioni": {
     "_id": "impostazioni",
     "_type": "impostazioni",
+    "presepeAttivo": false,
     "telefono": "+393406506421",
     "whatsapp": "+393406506421",
     "email": "ufficioturistico@prolocopresicce.it",

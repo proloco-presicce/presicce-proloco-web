@@ -3,7 +3,7 @@ import Base from '../../../layouts/Base.astro';
 import Gallery from '../../../components/Gallery.astro';
 import { langParam, locales, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
-import { getStazioni, image, isFallback, markdown, pick, type Image, type Stazione } from '../../../lib/content';
+import { getImpostazioni, getStazioni, image, isFallback, markdown, pick, type Image, type Stazione } from '../../../lib/content';
 
 export async function getStaticPaths() {
   const stazioni = await getStazioni();
@@ -17,10 +17,11 @@ export async function getStaticPaths() {
 
 const { locale, stazione, prev, next } = Astro.props as { locale: Locale; stazione: Stazione; prev: Stazione | null; next: Stazione | null };
 const tr = t(locale);
+const { presepeAttivo } = await getImpostazioni();
 const images = (stazione.immagini ?? []).map((i) => image(i, locale)).filter((i): i is Image => !!i);
 ---
 
-<Base locale={locale} title={pick(stazione.titolo, locale)} description={pick(stazione.sottotitolo, locale)} image={images[0]?.src} autoTranslated={isFallback(stazione.testo, locale)}>
+<Base locale={locale} noindex={!presepeAttivo} title={pick(stazione.titolo, locale)} description={pick(stazione.sottotitolo, locale)} image={images[0]?.src} autoTranslated={isFallback(stazione.testo, locale)}>
   <p class="eyebrow"><a href={path(locale, '/presepe-vivente/')}>{tr('navNativity')}</a> · {stazione.ordine}</p>
   <h1>{pick(stazione.titolo, locale)}</h1>
   <p class="subtitle">{pick(stazione.sottotitolo, locale)}</p>

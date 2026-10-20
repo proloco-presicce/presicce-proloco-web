@@ -3,18 +3,19 @@ import Base from '../../../layouts/Base.astro';
 import Gallery from '../../../components/Gallery.astro';
 import { localePaths, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
-import { getPagina, getStazioni, image, isFallback, markdown, pick, type Image } from '../../../lib/content';
+import { getImpostazioni, getPagina, getStazioni, image, isFallback, markdown, pick, type Image } from '../../../lib/content';
 
 export const getStaticPaths = localePaths;
 
 const { locale } = Astro.props as { locale: Locale };
 const tr = t(locale);
+const { presepeAttivo } = await getImpostazioni();
 const intro = await getPagina('presepe-vivente');
 const stazioni = await getStazioni();
 const images = (intro?.immagini ?? []).map((i) => image(i, locale)).filter((i): i is Image => !!i);
 ---
 
-<Base locale={locale} title={pick(intro?.titolo, locale) || tr('navNativity')} description={pick(intro?.sottotitolo, locale)} autoTranslated={isFallback(intro?.testo, locale)}>
+<Base locale={locale} noindex={!presepeAttivo} title={pick(intro?.titolo, locale) || tr('navNativity')} description={pick(intro?.sottotitolo, locale)} autoTranslated={isFallback(intro?.testo, locale)}>
   <h1>{pick(intro?.titolo, locale) || tr('navNativity')}</h1>
   {intro?.sottotitolo && <p class="subtitle">{pick(intro.sottotitolo, locale)}</p>}
 

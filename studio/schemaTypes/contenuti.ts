@@ -52,6 +52,14 @@ export const impostazioni = defineType({
   type: 'document',
   icon: CogIcon,
   fields: [
+    defineField({
+      name: 'presepeAttivo',
+      title: 'Presepe Vivente attivo',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Accendilo nel periodo di Natale: il Presepe compare nel menu e in home. Da spento le pagine delle tappe restano raggiungibili dai QR code, ma non si vedono nel sito né su Google.',
+    }),
     defineField({ name: 'heroTitolo', title: 'Titolo della home', type: 'stringaLocalizzata' }),
     defineField({ name: 'heroTesto', title: 'Testo di benvenuto', type: 'testoLocalizzato' }),
     defineField({ name: 'heroImmagine', title: 'Foto di apertura', type: 'immagineConDidascalia' }),

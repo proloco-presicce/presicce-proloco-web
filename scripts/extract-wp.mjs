@@ -143,6 +143,7 @@ const email = home.querySelector('a[href^="mailto:"]')?.getAttribute('href').rep
 const impostazioni = {
   _id: 'impostazioni',
   _type: 'impostazioni',
+  presepeAttivo: false,
   telefono: tel,
   whatsapp: tel,
   email,
