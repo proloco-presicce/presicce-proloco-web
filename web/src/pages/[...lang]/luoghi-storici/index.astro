@@ -4,6 +4,8 @@ import Accent from '../../../components/Accent.astro';
 import Gallery from '../../../components/Gallery.astro';
 import { localePaths, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
+import { Image as Picture } from 'astro:assets';
+import { foto, fotoTappa } from '../../../lib/foto';
 import { getPagina, getStazioni, image, isFallback, markdown, pick, type Image } from '../../../lib/content';
 
 export const getStaticPaths = localePaths;
@@ -18,15 +20,17 @@ const images = (intro?.immagini ?? []).map((i) => image(i, locale)).filter((i): 
 <Base locale={locale} title={pick(intro?.titolo, locale) || tr('navPlaces')} description={pick(intro?.sottotitolo, locale)} autoTranslated={isFallback(intro?.testo, locale)}>
   <div class="section-title"><h1>{pick(intro?.titolo, locale) || <Accent text={tr('homePlaces')} />}</h1><span class="bulbs" aria-hidden="true"></span></div>
   <p class="lead">{intro?.sottotitolo ? pick(intro.sottotitolo, locale) : tr('placesIntro').replace('{n}', String(stazioni.length))}</p>
+  <span class="cover"><Picture src={foto.vicolo} alt="" widths={[480, 900, 1400]} sizes="(min-width: 72rem) 68rem, 100vw" fetchpriority="high" loading="eager" /></span>
 
   <h2 class="sub">{tr('stops')}</h2>
   <ol class="cards stops">
     {stazioni.map((s) => {
+      const local = fotoTappa[s.slug.current];
       const img = image(s.immagini?.[0], locale, 240);
       return (
         <li class="card">
           <a href={path(locale, `/luoghi-storici/${s.slug.current}/`)}>
-            <span class="arch">{img ? <img src={img.src} alt="" loading="lazy" width="240" height="300" /> : <span class="n">{s.ordine}</span>}</span>
+            <span class="arch">{local ? <Picture src={local} alt="" widths={[140, 280]} sizes="70px" loading="lazy" /> : img ? <img src={img.src} alt="" loading="lazy" width="240" height="300" /> : <span class="n">{s.ordine}</span>}</span>
             <span class="text">
               <span class="step">{s.ordine}</span>
               <strong>{pick(s.titolo, locale)}</strong>
@@ -56,4 +60,6 @@ const images = (intro?.immagini ?? []).map((i) => image(i, locale)).filter((i): 
   strong { font-size: 20px; line-height: 1.15; letter-spacing: var(--track); }
   .sottotitolo { color: var(--muted); font-size: 15px; line-height: 1.35; }
   .intro { margin-block-start: 40px; }
+  .cover { display: block; margin-block-start: 20px; padding: 5px; border: 3px dotted var(--bulb); border-radius: 999px 999px 22px 22px; }
+  .cover img { width: 100%; height: clamp(220px, 45vw, 420px); object-fit: cover; border-radius: 999px 999px 18px 18px; }
 </style>

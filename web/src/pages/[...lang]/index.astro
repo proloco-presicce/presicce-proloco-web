@@ -8,6 +8,8 @@ import { localePaths, path, type Locale } from '../../i18n/config';
 import { t } from '../../i18n/ui';
 import { getEventi, getImpostazioni, getStazioni, image, pick, splitEventi } from '../../lib/content';
 import { dateBadge, telHref } from '../../lib/format';
+import { Image, getImage } from 'astro:assets';
+import { foto, fotoTappa } from '../../lib/foto';
 
 export const getStaticPaths = localePaths;
 
@@ -28,8 +30,11 @@ const preferiti = ['frantoi-ipogei', 'case-a-corte', 'santandrea-e-chiesa-madre'
 const luoghi = (preferiti.length === 3 ? preferiti : stazioni.slice(0, 3)).map((s) => ({
   href: path(locale, `/luoghi-storici/${s.slug.current}/`),
   title: pick(s.titolo, locale),
+  local: fotoTappa[s.slug.current],
   img: image(s.immagini?.[0], locale, 480),
 }));
+// Sfondo del riquadro "Visite guidate": la campagna con il convento degli Angeli, velata di rosso.
+const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' });
 ---
 
 <Base locale={locale} title={tr('siteName')} description={tr('heroText')}>
@@ -65,7 +70,7 @@ const luoghi = (preferiti.length === 3 ? preferiti : stazioni.slice(0, 3)).map((
         {luoghi.map((l) => (
           <li>
             <a href={l.href}>
-              <span class="arch"><span class="photo">{l.img && <img src={l.img.src} alt="" loading="lazy" width="480" height="640" />}</span></span>
+              <span class="arch"><span class="photo">{l.local ? <Image src={l.local} alt="" widths={[200, 400, 600]} sizes="(min-width: 72rem) 22rem, 30vw" loading="lazy" /> : l.img && <img src={l.img.src} alt="" loading="lazy" width="480" height="640" />}</span></span>
               <span class="p-title">{l.title}</span>
             </a>
           </li>
@@ -76,7 +81,7 @@ const luoghi = (preferiti.length === 3 ? preferiti : stazioni.slice(0, 3)).map((
   )}
 
   {impostazioni.telefono && (
-    <section class="tours">
+    <section class="tours" style={`--tours-bg: url(${toursBg.src})`}>
       <span class="eyebrow">{tr('toursEyebrow')}</span>
       <h2><Accent text={tr('toursTitle')} /></h2>
       <p>{tr('toursText')}</p>
@@ -123,7 +128,7 @@ const luoghi = (preferiti.length === 3 ? preferiti : stazioni.slice(0, 3)).map((
   .tours {
     margin: 44px auto 0; max-width: 40rem; padding: 70px 22px 28px; border-radius: 999px 999px 30px 30px;
     display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; color: #fff;
-    background: radial-gradient(70% 50% at 50% 0%, #ff4d63 0%, rgb(255 77 99 / 0) 70%), linear-gradient(180deg, var(--red) 0%, #7a0a1c 100%);
+    background: radial-gradient(70% 50% at 50% 0%, rgb(255 77 99 / 0.7) 0%, rgb(255 77 99 / 0) 70%), linear-gradient(180deg, rgb(200 16 46 / 0.62) 0%, rgb(122 10 28 / 0.9) 70%), var(--tours-bg) center / cover, var(--red);
     outline: 4px dotted var(--gold); outline-offset: -12px;
   }
   .tours .eyebrow { color: #ffd3d9; margin: 0; }
