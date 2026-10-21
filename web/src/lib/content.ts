@@ -27,17 +27,25 @@ interface RawDoc {
 
 interface RawStazione extends RawDoc {
   ordine: number;
+  epoca?: Localized;
+  indirizzo?: string;
+  cosaGuardare?: (Localized & { _key?: string })[];
 }
+
+export type TipoEvento = 'visita' | 'gita' | 'serata' | 'altro';
 
 interface RawEvento {
   _id: string;
   slug: { current: string };
   titolo: Localized;
+  tipo?: TipoEvento;
+  sommario?: Localized;
   dataInizio: string;
   dataFine?: string;
   luogo?: string;
   immagine?: RawImage | null;
   descrizione?: Localized;
+  foto?: RawImage[];
   telefono?: string;
   whatsapp?: string;
   inEvidenza?: boolean;

@@ -1,34 +1,156 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
 import Accent from '../../../components/Accent.astro';
 import EventCard from '../../../components/EventCard.astro';
-import { localePaths, type Locale } from '../../../i18n/config';
+import PageHero from '../../../components/PageHero.astro';
+import ToursBlock from '../../../components/ToursBlock.astro';
+import { htmlLang, localePaths, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
-import { getEventi, splitEventi } from '../../../lib/content';
+import { getEventi, getImpostazioni, getStazioni, splitEventi, type Evento, type TipoEvento } from '../../../lib/content';
+import { foto } from '../../../lib/foto';
 
 export const getStaticPaths = localePaths;
 
 const { locale } = Astro.props as { locale: Locale };
 const tr = t(locale);
+const impostazioni = await getImpostazioni();
 const { prossimi, passati } = splitEventi(await getEventi());
+const tappe = (await getStazioni()).length;
+
+// Eventi raggruppati per mese, con il titolo "Ottobre *2026*".
+const monthKey = (iso: string) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit' }).format(new Date(iso));
+const monthTitle = (iso: string) => {
+  const d = new Date(iso);
+  const month = new Intl.DateTimeFormat(htmlLang[locale], { timeZone: 'Europe/Rome', month: 'long' }).format(d);
+  const year = new Intl.DateTimeFormat(htmlLang[locale], { timeZone: 'Europe/Rome', year: 'numeric' }).format(d);
+  return `${month.charAt(0).toUpperCase() + month.slice(1)} *${year}*`;
+};
+const gruppi: { key: string; title: string; eventi: Evento[] }[] = [];
+for (const e of prossimi) {
+  const key = monthKey(e.dataInizio);
+  const last = gruppi.at(-1);
+  if (last?.key === key) last.eventi.push(e);
+  else gruppi.push({ key, title: monthTitle(e.dataInizio), eventi: [e] });
+}
+// Filtri: solo i tipi che ci sono davvero tra i prossimi eventi.
+const tipi = (['visita', 'gita', 'serata', 'altro'] as TipoEvento[]).filter((tipo) => prossimi.some((e) => e.tipo === tipo));
+const featured = prossimi[0]?.immagine ? prossimi[0]._id : null;
 ---
 
-<Base locale={locale} title={tr('navEvents')}>
-  <div class="section-title"><h1><Accent text={tr('homeEvents')} /></h1><span class="bulbs" aria-hidden="true"></span></div>
-  <h2 class="sub">{tr('upcomingEvents')}</h2>
-  {prossimi.length ? <div class="cards">{prossimi.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p class="empty">{tr('noEvents')}</p>}
+<Base locale={locale} title={tr('navEvents')} description={tr('eventsIntro')}>
+  <PageHero slot="hero" title={tr('homeEvents')} intro={tr('eventsIntro')} />
 
-  {
-    passati.length > 0 && (
-      <>
-        <h2 class="sub">{tr('pastEvents')}</h2>
-        <div class="cards past">{passati.map((evento) => <EventCard evento={evento} locale={locale} />)}</div>
-      </>
-    )
-  }
+  {prossimi.length > 1 && (
+    <div class="filters" role="group" aria-label={tr('filterLabel')} data-month={monthKey(new Date().toISOString())}>
+      <button type="button" class="pill" aria-pressed="true" data-filter="all">{tr('filterUpcoming')}</button>
+      <button type="button" class="pill" aria-pressed="false" data-filter="month">{tr('filterMonth')}</button>
+      {tipi.map((tipo) => <button type="button" class="pill" aria-pressed="false" data-filter={tipo}>{tr(`tipo_${tipo}`)}</button>)}
+    </div>
+  )}
+
+  <div class="months">
+    {gruppi.length ? gruppi.map((g) => (
+      <section class="month" data-month={g.key}>
+        <div class="section-title"><h2><Accent text={g.title} /></h2><span class="bulbs" aria-hidden="true"></span></div>
+        <div class="cards">
+          {g.eventi.map((evento) => (
+            <div class="item" data-tipo={evento.tipo ?? 'altro'} data-month={g.key}>
+              <EventCard evento={evento} locale={locale} photo={evento._id === featured ? 'always' : 'desktop'} />
+            </div>
+          ))}
+        </div>
+      </section>
+    )) : <p class="empty">{tr('noEvents')}</p>}
+    <p class="empty filtered" hidden>{tr('noEvents')}</p>
+    {passati.length > 0 && <a class="more" href="#passati">{tr('pastLink')} <span class="arrow" aria-hidden="true">→</span></a>}
+  </div>
+
+  <a class="promo" href={path(locale, '/luoghi-storici/')}>
+    <Image src={foto.vicolo} alt="" widths={[400, 800]} sizes="(min-width: 60rem) 28rem, 100vw" loading="lazy" />
+    <span class="promo-text">
+      <span class="promo-eyebrow">{tr('guideAlways')}</span>
+      <span class="promo-title"><Accent text={tr('guideTitle')} /></span>
+      <span class="promo-intro">{tr('guideText').replace('{n}', String(tappe))}</span>
+      <span class="promo-cta">{tr('guideStart')} <span class="arrow" aria-hidden="true">→</span></span>
+    </span>
+  </a>
+
+  {impostazioni.telefono && <ToursBlock locale={locale} phone={impostazioni.telefono} />}
+
+  {passati.length > 0 && (
+    <section class="past" id="passati">
+      <div class="section-title"><h2>{tr('pastEvents')}</h2><span class="bulbs" aria-hidden="true"></span></div>
+      <div class="cards">{passati.map((evento) => <EventCard evento={evento} locale={locale} />)}</div>
+    </section>
+  )}
 </Base>
 
+<script>
+  // Filtri dell'elenco: tutto in pagina, nessun ricaricamento.
+  const group = document.querySelector<HTMLElement>('.filters');
+  group?.addEventListener('click', (e) => {
+    const button = (e.target as Element).closest<HTMLButtonElement>('button[data-filter]');
+    if (!button) return;
+    group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+    const filter = button.dataset.filter;
+    const month = group.dataset.month;
+    document.querySelectorAll<HTMLElement>('.months .item').forEach((item) => {
+      item.hidden = filter === 'month' ? item.dataset.month !== month : filter !== 'all' && item.dataset.tipo !== filter;
+    });
+    let visible = 0;
+    document.querySelectorAll<HTMLElement>('.months .month').forEach((m) => {
+      const any = !!m.querySelector('.item:not([hidden])');
+      m.hidden = !any;
+      if (any) visible++;
+    });
+    const empty = document.querySelector<HTMLElement>('.filtered');
+    if (empty) empty.hidden = visible > 0;
+  });
+</script>
+
 <style>
-  .sub { font-size: 22px; letter-spacing: var(--track); margin-block: 32px 16px; }
-  .past { opacity: 0.7; }
+  .filters { display: flex; gap: 8px; overflow-x: auto; margin-inline: calc(var(--gutter) * -1); padding: 18px var(--gutter) 8px; scrollbar-width: none; }
+  .pill {
+    display: flex; align-items: center; flex: 0 0 auto; min-height: 44px; padding-inline: 18px; border-radius: 999px; cursor: pointer;
+    border: 2px solid var(--ink); background: var(--surface); color: var(--ink); font: 800 15px var(--sans); white-space: nowrap;
+  }
+  .pill[aria-pressed='true'] { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 3px 3px 0 var(--ink); }
+  .months { display: flex; flex-direction: column; gap: 34px; margin-block-start: 22px; }
+  .month { display: flex; flex-direction: column; gap: 16px; }
+  .month[hidden], .item[hidden] { display: none; }
+  .section-title h2 { font-size: 30px; }
+  .item { display: contents; }
+  .cards > .item:nth-child(even) :global(.card) { box-shadow: 6px 6px 0 var(--ink); }
+  :global([dir='rtl']) .cards > .item:nth-child(even) :global(.card) { box-shadow: -6px 6px 0 var(--ink); }
+  .more { align-self: center; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
+  :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
+
+  .promo {
+    display: flex; flex-direction: column; gap: 8px; margin: 30px calc(16px - var(--gutter)) 0; padding: 24px 22px; border-radius: 28px;
+    color: #fff; text-decoration: none; outline: 3px dotted var(--gold); outline-offset: -10px;
+    background: radial-gradient(70% 70% at 50% 20%, rgb(255 170 90 / 0.24) 0%, rgb(255 170 90 / 0) 70%), linear-gradient(180deg, var(--night) 0%, #4a0613 45%, var(--red-deep) 100%);
+  }
+  .promo:hover { color: #fff; }
+  .promo img { width: 100%; height: 150px; object-fit: cover; border-radius: 18px; }
+  .promo-text { display: flex; flex-direction: column; gap: 8px; }
+  .promo-eyebrow { font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+  .promo-title { font-size: 30px; line-height: 1; font-weight: 800; letter-spacing: -0.03em; font-family: var(--sans); }
+  .promo-title :global(.it) { color: var(--light); }
+  .promo-intro { color: rgb(255 255 255 / 0.9); }
+  .promo-cta {
+    margin-block-start: 6px; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding-inline: 18px;
+    border-radius: 999px; background: #fff; color: var(--red); font-weight: 800; font-family: var(--sans);
+  }
+  .past { display: flex; flex-direction: column; gap: 16px; margin-block-start: 44px; opacity: 0.75; scroll-margin-top: 16px; }
+
+  @media (min-width: 60rem) {
+    .filters { margin-inline: 0; padding-inline: 0; }
+    .section-title h2 { font-size: clamp(36px, 4vw, 48px); }
+    .cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 28px; }
+    .promo { margin-inline: 0; margin-block-start: 64px; flex-direction: row; align-items: center; gap: 36px; padding: 36px; outline-offset: -14px; }
+    .promo img { flex: 0 0 28rem; height: 260px; }
+    .promo-title { font-size: 44px; }
+  }
 </style>

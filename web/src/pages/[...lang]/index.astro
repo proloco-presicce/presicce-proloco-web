@@ -7,8 +7,9 @@ import Luminaria from '../../components/Luminaria.astro';
 import { localePaths, path, type Locale } from '../../i18n/config';
 import { t } from '../../i18n/ui';
 import { getEventi, getImpostazioni, getStazioni, image, pick, splitEventi } from '../../lib/content';
-import { dateBadge, telHref } from '../../lib/format';
-import { Image, getImage } from 'astro:assets';
+import { dateBadge } from '../../lib/format';
+import { Image } from 'astro:assets';
+import ToursBlock from '../../components/ToursBlock.astro';
 import { foto, fotoTappa } from '../../lib/foto';
 
 export const getStaticPaths = localePaths;
@@ -32,9 +33,14 @@ const luoghi = (preferiti.length === 3 ? preferiti : stazioni.slice(0, 3)).map((
   title: pick(s.titolo, locale),
   local: fotoTappa[s.slug.current],
   img: image(s.immagini?.[0], locale, 480),
+  extra: false,
 }));
-// Sfondo del riquadro "Visite guidate": la campagna con il convento degli Angeli, velata di rosso.
-const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' });
+// Da computer la fila di archi continua con il centro antico e la campagna (portano alla guida).
+const guida = path(locale, '/luoghi-storici/');
+luoghi.push(
+  { href: guida, title: tr('oldTown'), local: foto.vicolo, img: null, extra: true },
+  { href: guida, title: tr('countryside'), local: foto.campagna, img: null, extra: true },
+);
 ---
 
 <Base locale={locale} title={tr('siteName')} description={tr('heroText')}>
@@ -48,7 +54,7 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
           <span class="s-month">{badge.month.replace('.', '')}</span>
         </a>
       )}
-      <h1>Presicce <span class="it">{tr('heroSubtitle')}</span></h1>
+      <h1>{tr('townName')} <span class="it">{tr('heroSubtitle')}</span></h1>
       <p class="intro">{tr('heroText')}</p>
       <p class="book">{tr('heroBook')}</p>
       <BookingButtons locale={locale} phone={impostazioni.telefono} whatsapp={impostazioni.whatsapp} tone="night" />
@@ -57,7 +63,7 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
 
   <section class="block">
     <div class="section-title"><h2><Accent text={tr('homeEvents')} /></h2><span class="bulbs" aria-hidden="true"></span></div>
-    {inEvidenza.length ? <div class="cards">{inEvidenza.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p class="empty">{tr('noEvents')}</p>}
+    {inEvidenza.length ? <div class="cards">{inEvidenza.map((evento) => <EventCard evento={evento} locale={locale} photo="desktop" />)}</div> : <p class="empty">{tr('noEvents')}</p>}
     <a class="more" href={path(locale, '/eventi/')}>{tr('calendar')} <span class="arrow" aria-hidden="true">→</span></a>
   </section>
 
@@ -67,7 +73,7 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
       <p class="lead">{tr('placesIntro').replace('{n}', String(stazioni.length))}</p>
       <ul class="places">
         {luoghi.map((l) => (
-          <li>
+          <li class:list={{ extra: l.extra }}>
             <a href={l.href}>
               <span class="arch"><span class="photo">{l.local ? <Image src={l.local} alt="" widths={[200, 400, 600]} sizes="(min-width: 72rem) 22rem, 30vw" loading="lazy" /> : l.img && <img src={l.img.src} alt="" loading="lazy" width="480" height="640" />}</span></span>
               <span class="p-title">{l.title}</span>
@@ -79,14 +85,7 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
     </section>
   )}
 
-  {impostazioni.telefono && (
-    <section class="tours" style={`--tours-bg: url(${toursBg.src})`}>
-      <span class="eyebrow">{tr('toursEyebrow')}</span>
-      <h2><Accent text={tr('toursTitle')} /></h2>
-      <p>{tr('toursText')}</p>
-      <a class="btn" href={telHref(impostazioni.telefono)}>{tr('bookTour')}</a>
-    </section>
-  )}
+  {impostazioni.telefono && <ToursBlock locale={locale} phone={impostazioni.telefono} />}
 </Base>
 
 <style>
@@ -122,18 +121,7 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
   .photo img { width: 100%; height: 100%; object-fit: cover; }
   .p-title { font-weight: 800; font-size: 15px; line-height: 1.2; }
   .guide { width: 100%; }
-
-  .tours {
-    margin: 44px auto 0; max-width: 40rem; padding: 70px 22px 28px; border-radius: 999px 999px 30px 30px;
-    display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; color: #fff;
-    background: radial-gradient(70% 50% at 50% 0%, rgb(255 77 99 / 0.7) 0%, rgb(255 77 99 / 0) 70%), linear-gradient(180deg, rgb(200 16 46 / 0.62) 0%, rgb(122 10 28 / 0.9) 70%), var(--tours-bg) center / cover, var(--red);
-    outline: 4px dotted var(--gold); outline-offset: -12px;
-  }
-  .tours .eyebrow { color: #ffd3d9; margin: 0; }
-  .tours h2 { font-size: 32px; line-height: 1.05; letter-spacing: -0.03em; }
-  .tours h2 :global(.it) { color: var(--light); }
-  .tours p { margin: 0; color: rgb(255 255 255 / 0.9); }
-  .tours .btn { width: 100%; background: #fff; color: var(--red); }
+  .extra { display: none; }
 
   @media (min-width: 40rem) {
     .places { gap: 18px; }
@@ -144,10 +132,28 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
 
   /* Da computer: luminaria a fianco del testo, sotto la barra. */
   @media (min-width: 60rem) {
-    .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 30rem); align-items: end; column-gap: 48px; padding-block-start: 12px; }
-    .art { order: 2; margin-inline: 0; }
-    .copy { padding-block: 0 12px; }
-    .sticker { top: -96px; inset-inline-end: auto; inset-inline-start: 0; }
-    .places .photo { height: 280px; }
+    .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 37.5rem); align-items: end; column-gap: 56px; padding-block: 8px 22px; }
+    .art { order: 2; margin-inline: 0; position: relative; }
+    .copy { position: static; gap: 18px; padding-block-end: 36px; }
+    .hero { position: relative; }
+    .sticker { top: 0; inset-inline-end: auto; inset-inline-start: calc(100% - 37.5rem); width: 96px; height: 96px; transform: rotate(-8deg); }
+    .s-label { font-size: 12px; } .s-day { font-size: 30px; } .s-month { font-size: 13px; }
+    .hero h1 { font-size: clamp(64px, 8vw, 124px); line-height: 0.88; letter-spacing: -0.05em; }
+    .hero h1 .it { margin-block-start: 14px; font-size: clamp(38px, 4vw, 58px); }
+    .intro { font-size: 20px; line-height: 1.45; }
+    .book { font-size: 21px; }
+    .block { margin-block-start: 88px; gap: 28px; }
+    .section-title :global(h2) { font-size: clamp(40px, 5vw, 60px); }
+    .cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 28px; }
+    .more { align-self: flex-start; font-size: 19px; }
+    .lead { margin-block-start: -12px; max-width: 40rem; }
+    .places { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 22px; }
+    .extra { display: block; }
+    .places .photo { height: 260px; }
+    .p-title { font-size: 18px; }
+    .guide { align-self: flex-start; box-shadow: 5px 5px 0 var(--red); }
   }
+  /* Arabo: il risalto del titolo è solo nel colore, e il bollino va a sinistra ruotato al contrario. */
+  :global([dir='rtl']) .sticker { transform: rotate(-10deg); }
+  @media (min-width: 60rem) { :global([dir='rtl']) .sticker { transform: rotate(8deg); inset-inline-start: calc(100% - 37.5rem); } }
 </style>

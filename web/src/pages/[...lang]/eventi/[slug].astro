@@ -1,10 +1,13 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import Accent from '../../../components/Accent.astro';
 import BookingButtons from '../../../components/BookingButtons.astro';
+import EventCard from '../../../components/EventCard.astro';
+import Gallery from '../../../components/Gallery.astro';
 import { langParam, locales, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
-import { getEventi, getImpostazioni, image, isFallback, markdown, pick, type Evento } from '../../../lib/content';
-import { calendarHref, formatDate } from '../../../lib/format';
+import { getEventi, getImpostazioni, image, isFallback, markdown, pick, splitEventi, type Evento, type Image } from '../../../lib/content';
+import { accentLast, calendarHref, dateBadge, formatDate, formatTime, weekday } from '../../../lib/format';
 
 export async function getStaticPaths() {
   const eventi = await getEventi();
@@ -17,6 +20,14 @@ const impostazioni = await getImpostazioni();
 const titolo = pick(evento.titolo, locale);
 const img = image(evento.immagine, locale, 1200);
 const descrizione = pick(evento.descrizione, locale);
+const sommario = pick(evento.sommario, locale);
+const badge = dateBadge(evento.dataInizio, locale);
+const ora = formatTime(evento.dataInizio, locale);
+const quando = formatDate(evento.dataInizio, locale).replace(/\s\d{4}$/, '') + (evento.dataFine ? ` – ${formatDate(evento.dataFine, locale)}` : '');
+const foto = (evento.foto ?? []).map((i) => image(i, locale)).filter((i): i is Image => !!i);
+const altri = splitEventi(await getEventi()).prossimi.filter((e) => e._id !== evento._id).slice(0, 2);
+const phone = evento.telefono || impostazioni.telefono;
+const whatsapp = evento.whatsapp || impostazioni.whatsapp;
 
 // Dati strutturati schema.org: aiutano Google a mostrare l'evento nei risultati.
 const jsonLd = {
@@ -33,37 +44,134 @@ const jsonLd = {
 };
 ---
 
-<Base locale={locale} title={titolo} description={descrizione.slice(0, 160)} image={img?.src} autoTranslated={isFallback(evento.descrizione, locale)}>
-  <article class="evento">
-    <p class="eyebrow"><a href={path(locale, '/eventi/')}>{tr('navEvents')}</a></p>
-    <h1>{titolo}</h1>
-    <dl class="card info">
-      <div><dt>{tr('when')}</dt><dd>{formatDate(evento.dataInizio, locale, true)}{evento.dataFine && ` – ${formatDate(evento.dataFine, locale, true)}`}</dd></div>
-      {evento.luogo && <div><dt>{tr('where')}</dt><dd>{evento.luogo}</dd></div>}
-    </dl>
-    <BookingButtons
-      locale={locale}
-      phone={evento.telefono || impostazioni.telefono}
-      whatsapp={evento.whatsapp || impostazioni.whatsapp}
-      calendar={calendarHref(titolo, evento.dataInizio, evento.dataFine, evento.luogo)}
-    />
-    <div class="body">
-      {img && <img class="poster" src={img.src} alt={img.alt || titolo} width="1200" height="1600" />}
-      <div class="prose" set:html={markdown(evento.descrizione, locale)} />
+<Base
+  locale={locale}
+  title={titolo}
+  description={(sommario || descrizione).slice(0, 160)}
+  image={img?.src}
+  autoTranslated={isFallback(evento.descrizione, locale)}
+  back={{ href: path(locale, '/eventi/'), label: tr('navEvents') }}
+>
+  <div slot="hero" class="event-hero wrap">
+    <div class="poster-wrap">
+      <span class="arch">{img ? <img src={img.src} alt={img.alt || titolo} width="1200" height="1600" fetchpriority="high" /> : <span class="no-img" />}</span>
+      <span class="sticker" aria-hidden="true"><span class="s-label">{weekday(evento.dataInizio, locale)}</span><span class="s-day">{badge.day}</span><span class="s-month">{badge.month.replace('.', '')}</span></span>
     </div>
-  </article>
+    <div class="head">
+      {evento.tipo && <span class="chip">{tr(`tipo_${evento.tipo}`)}</span>}
+      <h1><Accent text={accentLast(titolo, locale)} /></h1>
+      {sommario && <p class="intro">{sommario}</p>}
+    </div>
+  </div>
+
+  <section class="facts">
+    <div class="fact"><span>{tr('when')}</span><b>{quando}</b></div>
+    {ora && <div class="fact"><span>{tr('time')}</span><b>{ora}</b></div>}
+    {evento.luogo && <div class="fact"><span>{tr('where')}</span><b>{evento.luogo}</b></div>}
+  </section>
+
+  {descrizione && (
+    <section class="block">
+      <div class="section-title"><h2><Accent text={tr('program')} /></h2><span class="bulbs" aria-hidden="true"></span></div>
+      <div class="prose program" set:html={markdown(evento.descrizione, locale)} />
+      <a class="btn secondary cal" href={calendarHref(titolo, evento.dataInizio, evento.dataFine, evento.luogo)} rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5" /></svg>
+        {tr('addToCalendar')}
+      </a>
+    </section>
+  )}
+
+  {foto.length > 0 && (
+    <section class="block">
+      <div class="section-title"><h2><Accent text={tr('photos')} /></h2><span class="bulbs" aria-hidden="true"></span></div>
+      <Gallery images={foto} />
+    </section>
+  )}
+
+  {(phone || whatsapp) && (
+    <section class="book">
+      <span class="eyebrow">{tr('booking')}</span>
+      <h2><Accent text={tr('bookTitle')} /></h2>
+      <p>{tr('bookText')}</p>
+      <BookingButtons locale={locale} phone={phone} whatsapp={whatsapp} tone="night" />
+    </section>
+  )}
+
+  {altri.length > 0 && (
+    <section class="block">
+      <div class="section-title"><h2><Accent text={tr('otherEvents')} /></h2><span class="bulbs" aria-hidden="true"></span></div>
+      <div class="cards">{altri.map((e) => <EventCard evento={e} locale={locale} />)}</div>
+      <a class="more" href={path(locale, '/eventi/')}>{tr('calendar')} <span class="arrow" aria-hidden="true">→</span></a>
+    </section>
+  )}
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </Base>
 
 <style>
-  .evento h1 { font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1; max-width: 48rem; overflow-wrap: anywhere; }
-  .info { margin: 24px 0 0; padding: 16px 20px; display: grid; gap: 12px; max-width: 42rem; }
-  .info dt { font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); }
-  .info dd { margin: 0; font-size: 18px; font-weight: 700; }
-  .info dd::first-letter { text-transform: uppercase; }
-  .body { display: grid; gap: 24px; margin-block-start: 8px; }
-  .poster { border-radius: 26px; border: 2px solid var(--ink); width: 100%; max-width: 30rem; }
+  .event-hero { display: flex; flex-direction: column; gap: 16px; padding-block-start: 16px; }
+  .poster-wrap { position: relative; padding-inline: 24px; max-width: 26rem; width: 100%; margin-inline: auto; }
+  .arch { display: block; padding: 5px; border: 3px dotted var(--gold); border-radius: 999px 999px 20px 20px; }
+  .arch img, .no-img { display: block; width: 100%; height: 300px; object-fit: cover; border-radius: 999px 999px 16px 16px; background: rgb(255 231 176 / 0.08); }
+  .sticker {
+    position: absolute; inset-inline-end: 2px; bottom: -18px; width: 78px; height: 78px; border-radius: 999px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.05; text-align: center;
+    background: #fff; color: var(--red); font-weight: 800; text-transform: uppercase; transform: rotate(10deg); box-shadow: 0 8px 20px rgb(0 0 0 / 0.3);
+    font-family: var(--sans);
+  }
+  :global([dir='rtl']) .sticker { transform: rotate(-10deg); }
+  .s-label { font-size: 9px; max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .s-day { font-size: 26px; line-height: 1; font-family: 'Bricolage Grotesque', var(--sans); }
+  .s-month { font-size: 12px; }
+  .head { display: flex; flex-direction: column; gap: 10px; padding-block-start: 10px; }
+  .chip { align-self: flex-start; display: inline-flex; align-items: center; min-height: 28px; padding-inline: 12px; border-radius: 999px; background: #fff; color: var(--red); font-size: 13px; font-weight: 800; }
+  h1 { font-size: clamp(2.6rem, 13vw, 4.2rem); line-height: 0.95; letter-spacing: -0.045em; overflow-wrap: anywhere; }
+  h1 :global(.it) { color: var(--light); }
+  :global(:root:is(:lang(ar), :lang(zh), :lang(ja))) h1 { letter-spacing: 0; line-height: 1.25; font-size: clamp(2.1rem, 10vw, 3.4rem); }
+  .intro { margin: 0; font-size: 17px; line-height: 1.4; color: rgb(255 255 255 / 0.92); max-width: 38rem; }
+
+  .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .fact { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 20px; background: var(--surface); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .fact:first-child, .fact:nth-child(4) { box-shadow: 4px 4px 0 var(--red); }
+  .fact:first-child { grid-column: 1 / -1; }
+  :global([dir='rtl']) .fact { box-shadow: -4px 4px 0 var(--ink); }
+  :global([dir='rtl']) .fact:first-child { box-shadow: -4px 4px 0 var(--red); }
+  .fact span { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); font-family: var(--sans); }
+  .fact b { font-size: 17px; line-height: 1.25; }
+  .fact b::first-letter { text-transform: uppercase; }
+
+  .block { display: flex; flex-direction: column; gap: 16px; margin-block-start: 36px; }
+  .section-title h2 { font-size: 30px; }
+  .cal { min-height: 48px; font-size: 16px; }
+  .more { align-self: center; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
+  :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
+
+  /* Gli elenchi della descrizione diventano le tappe della giornata, con le lampadine. */
+  .program :global(ul), .program :global(ol) { position: relative; list-style: none; margin: 0 0 1em; padding: 0; }
+  .program :global(ul)::before, .program :global(ol)::before { content: ''; position: absolute; inset-inline-start: 9px; top: 14px; bottom: 14px; border-inline-start: 3px dotted var(--bulb); }
+  .program :global(li) { position: relative; padding-block-end: 18px; padding-inline-start: 34px; }
+  .program :global(li:last-child) { padding-block-end: 0; }
+  .program :global(li)::before {
+    content: ''; position: absolute; inset-inline-start: 0; top: 4px; width: 14px; height: 14px; border-radius: 999px;
+    background: var(--gold); border: 3px solid var(--red); box-shadow: 0 0 10px rgb(255 200 87 / 0.9); box-sizing: content-box;
+  }
+
+  .book {
+    display: flex; flex-direction: column; gap: 12px; margin: 40px calc(16px - var(--gutter)) 0; padding: 30px 22px 24px; border-radius: 30px; color: #fff;
+    background: radial-gradient(70% 60% at 50% 0%, #ff4d63 0%, rgb(255 77 99 / 0) 70%), linear-gradient(180deg, var(--red) 0%, #7a0a1c 100%);
+    outline: 4px dotted var(--gold); outline-offset: -12px;
+  }
+  .book .eyebrow { color: #ffd3d9; margin: 0; }
+  .book h2 { font-size: 30px; line-height: 1; letter-spacing: -0.03em; }
+  .book h2 :global(.it) { color: var(--light); }
+  .book p { margin: 0; color: rgb(255 255 255 / 0.9); }
+
   @media (min-width: 60rem) {
-    .body { grid-template-columns: minmax(0, 26rem) minmax(0, 1fr); align-items: start; }
+    .event-hero { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); align-items: end; gap: 48px; padding-block: 12px 10px; }
+    .poster-wrap { padding: 0; margin: 0; }
+    .arch img, .no-img { height: 420px; }
+    .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 60rem; }
+    .fact:first-child { grid-column: auto; }
+    .block, .book { max-width: 48rem; }
+    .book { margin-inline: 0; padding: 40px; }
   }
 </style>

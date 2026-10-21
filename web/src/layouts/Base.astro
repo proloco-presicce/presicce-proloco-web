@@ -3,12 +3,12 @@
 // con le luminarie, bordo a festoni, card con ombra piena. Pensato prima per lo smartphone.
 // Usa solo proprietà CSS logiche (margin-inline, padding-block...) così l'arabo si gira da solo.
 // Le pagine possono riempire lo slot "hero" per mettere qualcosa nella testata scura.
-import { defaultLocale, htmlLang, locales, path, rtlLocales, stripLocale, type Locale } from '../i18n/config';
+import { defaultLocale, htmlLang, localeNames, locales, path, rtlLocales, stripLocale, type Locale } from '../i18n/config';
 import { t } from '../i18n/ui';
 import Accent from '../components/Accent.astro';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { getImpostazioni } from '../lib/content';
-import { telHref } from '../lib/format';
+import { prettyPhone, telHref } from '../lib/format';
 import { Image, getImage } from 'astro:assets';
 import logo from '../assets/logo-proloco.png';
 import { foto } from '../lib/foto';
@@ -20,9 +20,11 @@ interface Props {
   image?: string;
   autoTranslated?: boolean;
   noindex?: boolean;
+  /** Al posto del logo, un pulsante per tornare indietro (es. dalla scheda evento all'elenco). */
+  back?: { href: string; label: string };
 }
 
-const { locale, title, description = '', image, autoTranslated = false, noindex = false } = Astro.props;
+const { locale, title, description = '', image, autoTranslated = false, noindex = false, back } = Astro.props;
 const tr = t(locale);
 const impostazioni = await getImpostazioni();
 const current = stripLocale(Astro.url.pathname);
@@ -35,6 +37,8 @@ const nav = [
   { href: '#contatti', label: tr('navContact') },
 ];
 const hasHero = Astro.slots.has('hero');
+// Da computer il menu sta tutto nella barra: Eventi, Luoghi storici, Visite guidate, Contatti.
+const desktopNav = [nav[1], nav[2], { href: `${path(locale, '/')}#visite`, label: tr('toursEyebrow') }, nav[3]];
 // Per le condivisioni sui social, se la pagina non ha una sua foto: la Chiesa Madre dall'alto.
 const ogImage = image ?? new URL((await getImage({ src: foto.chiesaMadre, width: 1200, format: 'jpg' })).src, Astro.site).href;
 
@@ -42,7 +46,7 @@ const ogImage = image ?? new URL((await getImage({ src: foto.chiesaMadre, width:
 // per quelle lingue carichiamo anche un Noto che copre l'alfabeto (vedi le variabili --sans e --serif).
 const scriptFonts: Partial<Record<Locale, string>> = {
   el: 'family=Noto+Sans:wght@500;700;800&family=Noto+Serif:ital,wght@1,500;1,600',
-  ar: 'family=Noto+Sans+Arabic:wght@500;700;800&family=Noto+Naskh+Arabic:wght@500;600',
+  ar: 'family=Noto+Kufi+Arabic:wght@500;700;800&family=Noto+Naskh+Arabic:wght@400;600',
   zh: 'family=Noto+Sans+SC:wght@500;700;800&family=Noto+Serif+SC:wght@500;600',
   ja: 'family=Noto+Sans+JP:wght@500;700;800&family=Noto+Serif+JP:wght@500;600',
 };
@@ -78,11 +82,32 @@ const fonts = [
     <a class="skip" href="#main">{tr('skip')}</a>
     <div class:list={['night', { 'with-hero': hasHero }]}>
       <header class="bar wrap">
-        <a class="logo" href={path(locale, '/')}>
-          <Image src={logo} alt={tr('siteName')} width={56} height={56} densities={[1, 2, 3]} loading="eager" />
-        </a>
+        {back ? (
+          <a class="back" href={back.href}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+            {back.label}
+          </a>
+        ) : (
+          <a class="logo" href={path(locale, '/')}>
+            <Image src={logo} alt={tr('siteName')} width={76} height={76} densities={[1, 2, 3]} loading="eager" />
+          </a>
+        )}
+        <nav class="desk-nav" aria-label="Menu">
+          {desktopNav.map((item) => <a href={item.href}>{item.label}</a>)}
+        </nav>
         <div class="tools">
+          {back && (
+            <button type="button" class="share" aria-label={tr('share')} data-copied={tr('linkCopied')}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" /></svg>
+            </button>
+          )}
           <LanguageSwitcher locale={locale} />
+          {impostazioni.telefono && (
+            <a class="btn desk-call" href={telHref(impostazioni.telefono)}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+              {tr('call')}
+            </a>
+          )}
           <details class="menu popover">
             <summary aria-label={tr('openMenu')}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 8h14M5 16h14" /></svg>
@@ -105,12 +130,19 @@ const fonts = [
     <footer class="site-footer" id="contatti">
       <div class="wrap">
         <span class="bulbs light" aria-hidden="true"></span>
-        <p class="hello"><Accent text={tr('footerHello')} /></p>
-        <p class="footer-text">{tr('contactText')}</p>
-        {impostazioni.telefono && <a class="phone" href={telHref(impostazioni.telefono)}>{impostazioni.telefono.replace(/^\+39(\d{3})(\d{3})(\d+)$/, '+39 $1 $2 $3')}</a>}
-        {impostazioni.email && <a class="mail" href={`mailto:${impostazioni.email}`}>{impostazioni.email}</a>}
-        <ul class="footer-nav">{nav.slice(1, 3).map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
-        <p class="small">© {new Date().getFullYear()} Pro Loco Presicce</p>
+        <div class="f-hello">
+          <p class="hello"><Accent text={tr('footerHello')} /></p>
+          <p class="footer-text">{tr('contactText')}</p>
+        </div>
+        <div class="f-contacts">
+          {impostazioni.telefono && <a class="phone" href={telHref(impostazioni.telefono)}>{prettyPhone(impostazioni.telefono)}</a>}
+          {impostazioni.email && <a class="mail" href={`mailto:${impostazioni.email}`}>{impostazioni.email}</a>}
+          <ul class="footer-nav">{nav.slice(1, 3).map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+        </div>
+        <p class="small">
+          © {new Date().getFullYear()} Pro Loco Presicce
+          {locales.map((l) => <> · <a href={path(l, current)} hreflang={htmlLang[l]} lang={htmlLang[l]}>{localeNames[l]}</a></>)}
+        </p>
       </div>
     </footer>
 
@@ -125,6 +157,16 @@ const fonts = [
       });
       document.addEventListener('keydown', (e) => e.key === 'Escape' && closeAll());
       document.querySelectorAll('.popover .panel a[href^="#"]').forEach((a) => a.addEventListener('click', () => closeAll()));
+
+      // Condividi: sul telefono apre il menu di condivisione, altrimenti copia il link.
+      document.querySelector<HTMLButtonElement>('.share')?.addEventListener('click', async (e) => {
+        const button = e.currentTarget as HTMLButtonElement;
+        const data = { title: document.title, url: location.href };
+        if (navigator.share) return navigator.share(data).catch(() => {});
+        await navigator.clipboard?.writeText(location.href);
+        button.setAttribute('aria-label', button.dataset.copied ?? '');
+        button.classList.add('done');
+      });
     </script>
   </body>
 </html>
@@ -153,7 +195,7 @@ const fonts = [
     --lh-display: 0.95;
     color: var(--ink);
     background: var(--cream);
-    font-family: var(--sans);
+    font-family: var(--body, var(--sans));
     font-size: 17px;
     line-height: 1.5;
   }
@@ -162,7 +204,9 @@ const fonts = [
     --serif: 'Playfair Display', 'Noto Serif', Georgia, serif;
   }
   /* Arabo, cinese e giapponese non hanno corsivo e non vanno spaziati stretti. */
-  :root:lang(ar) { --sans: 'Bricolage Grotesque', 'Noto Sans Arabic', system-ui, sans-serif; --serif: 'Noto Naskh Arabic', serif; }
+  /* Arabo: Noto Kufi per titoli e pulsanti, Noto Naskh per il testo; il risalto è solo nel colore. */
+  :root:lang(ar) { --sans: 'Bricolage Grotesque', 'Noto Kufi Arabic', system-ui, sans-serif; --serif: var(--sans); --body: 'Bricolage Grotesque', 'Noto Naskh Arabic', serif; font-size: 18px; line-height: 1.8; }
+  :root:lang(ar) .it { font-weight: inherit; }
   :root:lang(zh) { --sans: 'Bricolage Grotesque', 'Noto Sans SC', 'PingFang SC', sans-serif; --serif: 'Noto Serif SC', serif; }
   :root:lang(ja) { --sans: 'Bricolage Grotesque', 'Noto Sans JP', 'Hiragino Sans', sans-serif; --serif: 'Noto Serif JP', serif; }
   :root:is(:lang(ar), :lang(zh), :lang(ja)) { --serif-style: normal; --track: 0; --track-tight: 0; --lh-display: 1.2; }
@@ -174,6 +218,7 @@ const fonts = [
   a { color: var(--red); }
   a:hover { color: var(--red-dark); }
   :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  h1, h2, h3, .btn, strong, b, summary, .eyebrow, .card { font-family: var(--sans); }
   h1, h2, h3 { line-height: 1.1; font-weight: 800; letter-spacing: var(--track-tight); margin-block: 0; }
   h1 { font-size: clamp(2.4rem, 11vw, 4rem); line-height: var(--lh-display); }
   .it { font-family: var(--serif); font-style: var(--serif-style); font-weight: 500; letter-spacing: -0.01em; }
@@ -192,9 +237,21 @@ const fonts = [
   .night:not(.with-hero) { background: linear-gradient(180deg, var(--night) 0%, #4a0613 55%, var(--red-deep) 100%); padding-block-end: 14px; }
   .scallop { height: 22px; background: radial-gradient(circle at 11px 0, var(--red-deep) 11px, transparent 11.5px) 0 0 / 22px 22px repeat-x; }
   .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; z-index: 20; }
+  .back {
+    display: flex; align-items: center; gap: 6px; min-height: 44px; padding-inline: 10px 16px; border-radius: 999px;
+    background: #fff; color: var(--red); font-weight: 800; font-size: 15px; text-decoration: none; font-family: var(--sans);
+  }
+  .back:hover { color: var(--red-dark); }
+  [dir='rtl'] .back svg { transform: scaleX(-1); }
+  .share {
+    display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; cursor: pointer;
+    border: 2px solid rgb(255 255 255 / 0.8); background: transparent; color: #fff;
+  }
+  .share.done { background: #fff; color: var(--red); }
+  .desk-nav, .bar .desk-call { display: none; }
   .logo { display: block; width: 56px; height: 56px; border-radius: 999px; box-shadow: 0 4px 14px rgb(0 0 0 / 0.35); }
   .logo img { width: 100%; height: 100%; border-radius: 999px; }
-  .tools { display: flex; gap: 8px; }
+  .tools { display: flex; gap: 8px; align-items: center; }
   .popover { position: relative; }
   .popover summary { list-style: none; cursor: pointer; }
   .popover summary::-webkit-details-marker { display: none; }
@@ -245,6 +302,7 @@ const fonts = [
 
   .site-footer { margin-block-start: 3.5rem; padding-block: 30px 40px; background: var(--red); color: #fff; }
   .site-footer .wrap { display: flex; flex-direction: column; gap: 8px; }
+  .f-hello, .f-contacts { display: flex; flex-direction: column; gap: 8px; }
   .site-footer .bulbs { margin-block-end: 12px; }
   .site-footer a { color: #ffe3e7; }
   .hello { margin: 0; font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: var(--track-tight); }
@@ -254,8 +312,31 @@ const fonts = [
   .footer-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; list-style: none; margin: 8px 0 0; padding: 0; }
   .footer-nav a { display: inline-block; padding-block: 10px; font-weight: 700; }
   .small { margin: 0; font-size: 14px; color: #ffd3d9; }
+  .small a { color: inherit; text-decoration: none; }
+  .small a:hover { text-decoration: underline; }
 
   @media (min-width: 48rem) {
     :root { --gutter: 32px; }
+  }
+  /* Da computer: menu nella barra, pulsante Chiama, footer su due colonne. */
+  @media (min-width: 60rem) {
+    .wrap { max-width: 1240px; }
+    .night { padding-block-start: 20px; }
+    .bar { gap: 14px 32px; }
+    .logo { width: 76px; height: 76px; }
+    .desk-nav { display: flex; flex-wrap: wrap; gap: 4px 32px; margin-inline-end: auto; margin-inline-start: 16px; }
+    .desk-nav a { color: #fff; text-decoration: none; font-weight: 800; font-size: 17px; padding: 10px 2px; font-family: var(--sans); }
+    .desk-nav a:hover { color: var(--gold); }
+    .bar .desk-call { display: inline-flex; min-height: 48px; padding-inline: 22px; background: #fff; color: var(--red); font-size: 16px; }
+    .desk-call:hover { color: var(--red-dark); }
+    .menu { display: none; }
+    .site-footer { margin-block-start: 96px; padding-block: 48px 40px; }
+    .site-footer .wrap { flex-direction: row; flex-wrap: wrap; gap: 32px 64px; }
+    .site-footer .bulbs { flex: 1 1 100%; border-top-width: 5px; margin: 0; }
+    .f-hello { flex: 1 1 360px; }
+    .f-contacts { flex: 1 1 300px; }
+    .hello { font-size: clamp(36px, 4vw, 52px); line-height: 1; }
+    .site-footer .phone { font-size: 30px; }
+    .site-footer .small { flex: 1 1 100%; padding-block-start: 22px; border-top: 1px solid rgb(255 255 255 / 0.3); font-size: 15px; }
   }
 </style>
