@@ -1,5 +1,5 @@
 // Pagina temporanea (ottobre 2026): toglie dai luoghi storici le foto prese da altri siti,
-// mette al loro posto le foto della Pro Loco e aggiunge il credito alla foto di Wikimedia.
+// e aggiunge il credito alla foto di Wikimedia.
 // Si apre con /api/sistema-foto?k=<SANITY_WEBHOOK_SECRET> (anteprima) e &applica=1 (esegue).
 // Le foto tolte restano nell'archivio di Sanity, solo scollegate. Va tolta subito dopo l'uso.
 import type { APIRoute } from 'astro';
@@ -13,12 +13,9 @@ export const prerender = false;
 const ALTRI_SITI = ['colonna-di-sant-andrea', 'Presicce_3', 'izzo_', 'GINO0007', 'GINO0008', '29_05_17-05_12_34', 'case-a-corte-presicce', 'ICCD4757936'];
 const WIKIMEDIA = '960px-Chiesa_madre';
 
-// Foto della Pro Loco (mandate da Luigi il 21/10/2026), in testa alla galleria del luogo.
-const NOSTRE: Record<string, { file: string; alt: string; didascalia: string }> = {
-  'stazione-santandrea-e-chiesa-madre': { file: 'chiesa-madre-dall-alto.jpg', alt: 'La Chiesa Madre di Presicce vista dall’alto', didascalia: 'La Chiesa Madre vista dall’alto' },
-  'stazione-case-a-corte': { file: 'corti-giardino.jpg', alt: 'Il giardino di una corte storica di Presicce', didascalia: 'Il giardino di una corte storica' },
-  'stazione-frantoi-ipogei': { file: 'frantoi-ipogei.jpg', alt: 'Interno di un frantoio ipogeo con la macina', didascalia: 'Un frantoio ipogeo con la sua macina' },
-};
+// Le foto della Pro Loco per Sant'Andrea, case a corte e frantoi sono già nel sito come copertina
+// delle tappe (web/src/lib/foto.ts): qui non si aggiungono, per non mostrarle due volte.
+const NOSTRE: Record<string, { file: string; alt: string; didascalia: string }> = {};
 
 interface Img {
   _key: string;
