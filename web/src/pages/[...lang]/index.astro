@@ -48,7 +48,6 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
           <span class="s-month">{badge.month.replace('.', '')}</span>
         </a>
       )}
-      <p class="welcome">{tr('welcome')}</p>
       <h1>Presicce <span class="it">{tr('heroSubtitle')}</span></h1>
       <p class="intro">{tr('heroText')}</p>
       <p class="book">{tr('heroBook')}</p>
@@ -104,7 +103,6 @@ const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' 
   .s-label { font-size: 10px; letter-spacing: 0.02em; }
   .s-day { font-size: 24px; line-height: 1; }
   .s-month { font-size: 12px; }
-  .welcome { margin: 0; font-size: 15px; font-weight: 700; color: var(--gold); }
   .hero h1 { font-size: clamp(3.4rem, 17vw, 5.5rem); line-height: 0.9; letter-spacing: -0.045em; }
   .hero h1 .it { display: block; margin-block-start: 8px; font-size: clamp(2.1rem, 9.6vw, 3.2rem); line-height: 1.05; color: var(--light); letter-spacing: -0.01em; }
   :global(:root:is(:lang(ar), :lang(zh), :lang(ja), :lang(el))) .hero h1 .it { font-size: clamp(1.8rem, 8vw, 2.8rem); line-height: 1.25; }
