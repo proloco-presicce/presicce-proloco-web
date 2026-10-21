@@ -1,0 +1,61 @@
+---
+// Riquadro rosso "Visite guidate" ad arco: si prenota solo per telefono, si paga sul posto.
+// Da computer diventa orizzontale con la foto del frantoio.
+import { Image } from 'astro:assets';
+import Accent from './Accent.astro';
+import { type Locale } from '../i18n/config';
+import { t } from '../i18n/ui';
+import { foto } from '../lib/foto';
+import { telHref } from '../lib/format';
+
+interface Props {
+  locale: Locale;
+  phone: string;
+}
+
+const { locale, phone } = Astro.props;
+const tr = t(locale);
+---
+
+<section class="tours" id="visite">
+  <div class="copy">
+    <span class="eyebrow">{tr('toursEyebrow')}</span>
+    <h2><Accent text={tr('toursTitle')} /></h2>
+    <p>{tr('toursText')}</p>
+    <a class="btn" href={telHref(phone)}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+      {tr('bookTour')}
+    </a>
+  </div>
+  <span class="photo"><Image src={foto.frantoio} alt="" widths={[400, 720]} sizes="420px" loading="lazy" /></span>
+</section>
+
+<style>
+  .tours {
+    margin: 44px auto 0; max-width: 40rem; padding: 70px 22px 28px; border-radius: 999px 999px 30px 30px; color: #fff; text-align: center;
+    background: radial-gradient(70% 50% at 50% 0%, #ff4d63 0%, rgb(255 77 99 / 0) 70%), linear-gradient(180deg, var(--red) 0%, #7a0a1c 100%);
+    outline: 4px dotted var(--gold); outline-offset: -12px; scroll-margin-top: 24px;
+  }
+  .copy { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .eyebrow { color: #ffd3d9; margin: 0; }
+  h2 { font-size: 32px; line-height: 1.05; letter-spacing: -0.03em; }
+  h2 :global(.it) { color: var(--light); }
+  p { margin: 0; color: rgb(255 255 255 / 0.9); }
+  .btn { width: 100%; background: #fff; color: var(--red); }
+  .btn:hover { color: var(--red-dark); }
+  .photo { display: none; }
+
+  @media (min-width: 60rem) {
+    .tours {
+      max-width: none; margin-block-start: 96px; padding: 56px; border-radius: 48px; text-align: start;
+      display: flex; align-items: center; gap: 40px 56px; outline-offset: -16px;
+      background: radial-gradient(60% 80% at 20% 0%, #ff4d63 0%, rgb(255 77 99 / 0) 70%), linear-gradient(160deg, var(--red) 0%, #7a0a1c 100%);
+    }
+    .copy { flex: 1 1 420px; align-items: flex-start; gap: 16px; }
+    h2 { font-size: clamp(38px, 4.4vw, 58px); line-height: 1; letter-spacing: -0.04em; }
+    p { max-width: 32rem; }
+    .btn { width: auto; padding-inline: 30px; }
+    .photo { display: block; flex: 1 1 320px; max-width: 420px; padding: 5px; border: 3px dotted var(--gold); border-radius: 999px 999px 28px 28px; }
+    .photo img { display: block; width: 100%; height: 380px; object-fit: cover; border-radius: 999px 999px 22px 22px; }
+  }
+</style>

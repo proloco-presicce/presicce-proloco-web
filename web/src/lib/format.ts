@@ -39,3 +39,24 @@ export function calendarHref(title: string, startIso: string, endIso: string | u
 /** Giorno della settimana per esteso, per la riga sotto il titolo delle card ("domenica"). */
 export const weekday = (iso: string, locale: Locale) =>
   new Intl.DateTimeFormat(htmlLang[locale], { timeZone: TIME_ZONE, weekday: 'long' }).format(new Date(iso));
+
+/** Numero leggibile: "+393406506421" → "+39 340 650 6421". */
+export const prettyPhone = (phone: string) => phone.replace(/^\+39(\d{3})(\d{3})(\d+)$/, '+39 $1 $2 $3');
+
+/** Link a Google Maps per un luogo del paese. */
+export const mapsHref = (place: string) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place}, 73054 Presicce-Acquarica LE`)}`;
+
+/** Ora dell'evento ("21:00"), vuota se l'evento non ha un orario. */
+export function formatTime(iso: string, locale: Locale) {
+  if (iso.includes('T00:00:00')) return '';
+  return new Intl.DateTimeFormat(htmlLang[locale], { timeZone: TIME_ZONE, hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+}
+
+/** Titolo con l'ultima parola in corsivo ("Gita a *Pompei*"), solo per le lingue con gli spazi tra le parole. */
+export function accentLast(title: string, locale: Locale) {
+  const clean = title.replaceAll('*', '');
+  const cut = clean.lastIndexOf(' ');
+  if (['zh', 'ja', 'ar'].includes(locale) || cut < 1) return clean;
+  return `${clean.slice(0, cut)} *${clean.slice(cut + 1)}*`;
+}

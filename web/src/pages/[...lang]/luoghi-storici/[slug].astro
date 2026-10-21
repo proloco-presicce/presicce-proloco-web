@@ -1,11 +1,14 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import Accent from '../../../components/Accent.astro';
 import Gallery from '../../../components/Gallery.astro';
+import PageHero from '../../../components/PageHero.astro';
 import { langParam, locales, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
 import { Image as Picture } from 'astro:assets';
 import { fotoTappa } from '../../../lib/foto';
-import { getStazioni, image, isFallback, markdown, pick, type Image, type Stazione } from '../../../lib/content';
+import { telHref, mapsHref, accentLast } from '../../../lib/format';
+import { getImpostazioni, getStazioni, image, isFallback, markdown, pick, type Image, type Stazione } from '../../../lib/content';
 
 export async function getStaticPaths() {
   const stazioni = await getStazioni();
@@ -20,42 +23,133 @@ export async function getStaticPaths() {
 const { locale, stazione, prev, next } = Astro.props as { locale: Locale; stazione: Stazione; prev: Stazione | null; next: Stazione | null };
 const tr = t(locale);
 const total = (await getStazioni()).length;
+const impostazioni = await getImpostazioni();
+const titolo = pick(stazione.titolo, locale);
+const epoca = pick(stazione.epoca, locale);
+const cosaGuardare = (stazione.cosaGuardare ?? []).map((c) => pick(c, locale)).filter(Boolean);
+const stepOf = tr('stepOf').replace('{i}', String(stazione.ordine)).replace('{n}', String(total));
 const local = fotoTappa[stazione.slug.current];
-const images = (stazione.immagini ?? []).map((i) => image(i, locale)).filter((i): i is Image => !!i);
+const imagesAll = (stazione.immagini ?? []).map((i) => image(i, locale)).filter((i): i is Image => !!i);
+const images = local ? imagesAll : imagesAll.slice(1);
+const cover = local ? null : imagesAll[0] ?? null;
 ---
 
-<Base locale={locale} title={pick(stazione.titolo, locale)} description={pick(stazione.sottotitolo, locale)} image={images[0]?.src} autoTranslated={isFallback(stazione.testo, locale)}>
-  <article class="tappa">
-    <p class="eyebrow"><a href={path(locale, '/luoghi-storici/')}>{tr('navPlaces')}</a> · {stazione.ordine}/{total}</p>
-    <h1>{pick(stazione.titolo, locale)}</h1>
-    <p class="lead">{pick(stazione.sottotitolo, locale)}</p>
-    {local ? (
-      <figure class="cover">
-        <span class="arch"><Picture src={local} alt={pick(stazione.titolo, locale)} widths={[480, 900, 1400]} sizes="(min-width: 42rem) 42rem, 100vw" fetchpriority="high" loading="eager" /></span>
-      </figure>
-    ) : images[0] && (
-      <figure class="cover">
-        <span class="arch"><img src={images[0].src} alt={images[0].alt} width="1200" height="900" fetchpriority="high" /></span>
-        {images[0].caption && <figcaption>{images[0].caption}</figcaption>}
-      </figure>
+<Base locale={locale} title={titolo} description={pick(stazione.sottotitolo, locale)} image={imagesAll[0]?.src} autoTranslated={isFallback(stazione.testo, locale)}>
+  <PageHero slot="hero" title={accentLast(titolo, locale)} eyebrow={tr('navPlaces')} intro={pick(stazione.sottotitolo, locale)}>
+    <div slot="before-title" class="progress">
+      <span class="dots" role="img" aria-label={stepOf}>
+        {Array.from({ length: total }, (_, i) => <span class:list={['dot', { on: i + 1 === stazione.ordine }]} />)}
+      </span>
+      <span class="count" aria-hidden="true">{stepOf}</span>
+    </div>
+  </PageHero>
+
+  {(local || cover) && (
+    <figure class="cover">
+      <span class="arch">
+        {local ? (
+          <Picture src={local} alt={titolo} widths={[480, 900, 1400]} sizes="(min-width: 48rem) 46rem, 100vw" fetchpriority="high" loading="eager" />
+        ) : (
+          cover && <img src={cover.src} alt={cover.alt || titolo} width="1200" height="900" fetchpriority="high" />
+        )}
+      </span>
+      {cover?.caption && <figcaption>{cover.caption}</figcaption>}
+    </figure>
+  )}
+
+  <section class="facts">
+    {epoca && <div class="fact"><span>{tr('era')}</span><b>{epoca}</b></div>}
+    {stazione.indirizzo && <div class="fact"><span>{tr('where')}</span><b>{stazione.indirizzo}</b></div>}
+    <a class="btn secondary map" href={mapsHref(stazione.indirizzo || titolo)} rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+      {tr('openMap')}
+    </a>
+  </section>
+
+  <section class="block">
+    <div class="prose story" set:html={markdown(stazione.testo, locale)} />
+    {cosaGuardare.length > 0 && (
+      <div class="look">
+        <span class="look-title">{tr('lookFor')}</span>
+        <ul>{cosaGuardare.map((c) => <li>{c}</li>)}</ul>
+      </div>
     )}
-    <div class="prose" set:html={markdown(stazione.testo, locale)} />
-    <Gallery images={local ? images : images.slice(1)} />
-  </article>
+    <Gallery images={images} />
+  </section>
+
   <nav class="pager" aria-label={tr('stops')}>
-    {prev && <a class="btn secondary" rel="prev" href={path(locale, `/luoghi-storici/${prev.slug.current}/`)}><span class="arrow" aria-hidden="true">←</span> {pick(prev.titolo, locale)}</a>}
-    {next && <a class="btn outline" rel="next" href={path(locale, `/luoghi-storici/${next.slug.current}/`)}>{pick(next.titolo, locale)} <span class="arrow" aria-hidden="true">→</span></a>}
+    {prev ? (
+      <a rel="prev" href={path(locale, `/luoghi-storici/${prev.slug.current}/`)}><span class="p-small"><span class="arrow">←</span> {tr('stepN').replace('{i}', String(prev.ordine))}</span><span class="p-big">{pick(prev.titolo, locale)}</span></a>
+    ) : (
+      <a href={path(locale, '/luoghi-storici/')}><span class="p-small"><span class="arrow">←</span> {tr('back')}</span><span class="p-big">{tr('allPlaces')}</span></a>
+    )}
+    {next ? (
+      <a class="next" rel="next" href={path(locale, `/luoghi-storici/${next.slug.current}/`)}><span class="p-small">{tr('stepN').replace('{i}', String(next.ordine))} <span class="arrow">→</span></span><span class="p-big">{pick(next.titolo, locale)}</span></a>
+    ) : (
+      <a class="next" href={path(locale, '/luoghi-storici/')}><span class="p-small">{tr('navPlaces')} <span class="arrow">→</span></span><span class="p-big">{tr('allPlaces')}</span></a>
+    )}
   </nav>
+
+  {impostazioni.telefono && (
+    <section class="guide-cta">
+      <h2><Accent text={tr('guideCta')} /></h2>
+      <p>{tr('guideCtaText')}</p>
+      <a class="btn" href={telHref(impostazioni.telefono)}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+        {tr('callToBook')}
+      </a>
+    </section>
+  )}
 </Base>
 
 <style>
-  .tappa h1 { font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1; max-width: 48rem; }
-  .cover { margin: 24px 0; max-width: 42rem; }
-  .cover .arch { display: block; padding: 5px; border: 3px dotted var(--bulb); border-radius: 999px 999px 22px 22px; }
-  .cover img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 999px 999px 18px 18px; background: var(--ph); }
+  .progress { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .dots { display: flex; align-items: center; gap: 7px; }
+  .dot { width: 10px; height: 10px; border-radius: 999px; background: rgb(255 231 176 / 0.28); }
+  .dot.on { width: 14px; height: 14px; background: var(--gold); box-shadow: 0 0 10px 2px rgb(255 200 87 / 0.8); }
+  .count { font-size: 15px; font-weight: 800; color: var(--light); }
+
+  .cover { margin: 0; max-width: 46rem; }
+  .cover .arch { display: block; padding: 4px; border: 3px dotted var(--bulb); border-radius: 999px 999px 24px 24px; }
+  .cover img { display: block; width: 100%; height: clamp(320px, 80vw, 520px); object-fit: cover; border-radius: 999px 999px 20px 20px; background: var(--ph); }
   figcaption { color: var(--muted); font-size: 0.9rem; margin-block-start: 0.5rem; }
-  .pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-block-start: 2.5rem; }
-  .pager .btn { flex: 1 1 14rem; }
-  .pager [rel='next'] { margin-inline-start: auto; }
+
+  .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-block-start: 20px; max-width: 46rem; }
+  .fact { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 20px; background: var(--surface); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--red); }
+  .fact + .fact { box-shadow: 4px 4px 0 var(--ink); }
+  :global([dir='rtl']) .fact { box-shadow: -4px 4px 0 var(--red); }
+  .fact span { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); font-family: var(--sans); }
+  .fact b { font-size: 17px; line-height: 1.25; }
+  .map { grid-column: 1 / -1; min-height: 48px; font-size: 16px; }
+
+  .block { display: flex; flex-direction: column; gap: 14px; margin-block-start: 36px; }
+  /* I titoli scritti nel testo ("La storia", "Curiosità"...) prendono lo stile dei titoli di sezione. */
+  .story :global(h2) { display: flex; align-items: center; gap: 12px; font-size: 30px; margin-block: 1.2em 0.5em; }
+  .story :global(h2:first-child) { margin-block-start: 0; }
+  .story :global(h2)::after { content: ''; flex: 1; min-width: 2rem; border-top: 4px dotted var(--bulb); }
+  .look { margin-block-start: 6px; padding: 18px; border-radius: 22px; background: var(--surface); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--red); display: flex; flex-direction: column; gap: 10px; max-width: 42rem; }
+  .look-title { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); font-family: var(--sans); }
+  .look ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-weight: 700; }
+  .look li { display: flex; gap: 12px; align-items: center; }
+  .look li::before { content: ''; flex: 0 0 12px; height: 12px; border-radius: 999px; background: var(--gold); border: 3px solid var(--red); }
+
+  .pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-block-start: 32px; max-width: 46rem; }
+  .pager a { display: flex; flex-direction: column; justify-content: center; min-height: 72px; padding: 10px 16px; border-radius: 22px; border: 2px solid var(--ink); background: var(--surface); color: var(--ink); text-decoration: none; }
+  .pager a.next { background: var(--red); color: #fff; box-shadow: 4px 4px 0 var(--ink); }
+  :global([dir='rtl']) .pager a.next { box-shadow: -4px 4px 0 var(--ink); }
+  .p-small { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .next .p-small { color: #ffd3d9; }
+  .p-big { font-weight: 800; line-height: 1.2; font-family: var(--sans); }
   :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
+
+  .guide-cta {
+    display: flex; flex-direction: column; gap: 12px; margin: 40px calc(16px - var(--gutter)) 0; padding: 26px 22px; border-radius: 30px; color: #fff; max-width: 46rem;
+    background: radial-gradient(70% 70% at 50% 20%, rgb(255 170 90 / 0.24) 0%, rgb(255 170 90 / 0) 70%), linear-gradient(180deg, var(--night) 0%, #4a0613 45%, var(--red-deep) 100%);
+    outline: 3px dotted var(--gold); outline-offset: -10px;
+  }
+  .guide-cta h2 { font-size: 28px; line-height: 1.05; letter-spacing: -0.03em; }
+  .guide-cta h2 :global(.it) { color: var(--light); }
+  .guide-cta p { margin: 0; color: rgb(255 255 255 / 0.9); }
+  .guide-cta .btn { background: #fff; color: var(--red); }
+  @media (min-width: 48rem) { .guide-cta { margin-inline: 0; padding: 36px; } }
 </style>

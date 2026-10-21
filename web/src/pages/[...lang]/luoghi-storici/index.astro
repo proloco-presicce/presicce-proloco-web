@@ -2,6 +2,7 @@
 import Base from '../../../layouts/Base.astro';
 import Accent from '../../../components/Accent.astro';
 import Gallery from '../../../components/Gallery.astro';
+import PageHero from '../../../components/PageHero.astro';
 import { localePaths, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
 import { Image as Picture } from 'astro:assets';
@@ -18,8 +19,12 @@ const images = (intro?.immagini ?? []).map((i) => image(i, locale)).filter((i): 
 ---
 
 <Base locale={locale} title={pick(intro?.titolo, locale) || tr('navPlaces')} description={pick(intro?.sottotitolo, locale)} autoTranslated={isFallback(intro?.testo, locale)}>
-  <div class="section-title"><h1>{pick(intro?.titolo, locale) || <Accent text={tr('homePlaces')} />}</h1><span class="bulbs" aria-hidden="true"></span></div>
-  <p class="lead">{intro?.sottotitolo ? pick(intro.sottotitolo, locale) : tr('placesIntro').replace('{n}', String(stazioni.length))}</p>
+  <PageHero
+    slot="hero"
+    title={tr('guideTitle')}
+    eyebrow={tr('guideAlways')}
+    intro={intro?.sottotitolo ? pick(intro.sottotitolo, locale) : tr('guideText').replace('{n}', String(stazioni.length))}
+  />
   <span class="cover"><Picture src={foto.vicolo} alt="" widths={[480, 900, 1400]} sizes="(min-width: 72rem) 68rem, 100vw" fetchpriority="high" loading="eager" /></span>
 
   <h2 class="sub">{tr('stops')}</h2>
@@ -47,7 +52,7 @@ const images = (intro?.immagini ?? []).map((i) => image(i, locale)).filter((i): 
 </Base>
 
 <style>
-  .sub { font-size: 22px; letter-spacing: var(--track); margin-block: 32px 16px; }
+  .sub { font-size: 30px; margin-block: 32px 16px; }
   .stops { list-style: none; margin: 0; padding: 0; }
   .stops a { display: flex; gap: 14px; align-items: center; padding: 12px; color: var(--ink); text-decoration: none; min-height: 44px; }
   .arch {

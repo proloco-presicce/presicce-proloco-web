@@ -1,37 +1,68 @@
 ---
-// Card evento della proposta E: bollino ad arco con la data, titolo e giorno · luogo.
+// Card evento della proposta E: bollino ad arco con la data, tipo, titolo e giorno · luogo.
+// photo="always" la mostra grande con la locandina sopra; "desktop" solo da computer.
 import { path, type Locale } from '../i18n/config';
-import { pick, type Evento } from '../lib/content';
+import { t } from '../i18n/ui';
+import { image, pick, type Evento } from '../lib/content';
 import { dateBadge, weekday } from '../lib/format';
 
 interface Props {
   evento: Evento;
   locale: Locale;
+  photo?: 'never' | 'always' | 'desktop';
 }
 
-const { evento, locale } = Astro.props;
+const { evento, locale, photo = 'never' } = Astro.props;
+const tr = t(locale);
 const badge = dateBadge(evento.dataInizio, locale);
-const details = [weekday(evento.dataInizio, locale), evento.luogo].filter(Boolean).join(' · ');
+const day = weekday(evento.dataInizio, locale);
+const details = [day.charAt(0).toUpperCase() + day.slice(1), evento.luogo].filter(Boolean).join(' · ');
+const img = photo !== 'never' ? image(evento.immagine, locale, 800) : null;
+const hasPoster = photo === 'desktop' || (photo === 'always' && !!img);
 ---
 
-<a class="card event" href={path(locale, `/eventi/${evento.slug.current}/`)}>
+<a class:list={['card', 'event', hasPoster && `photo-${photo}`]} href={path(locale, `/eventi/${evento.slug.current}/`)}>
+  {hasPoster && <span class="poster">{img && <img src={img.src} alt="" loading="lazy" width="800" height="500" />}</span>}
   <span class="date"><span class="day">{badge.day}</span><span class="month">{badge.month.replace('.', '')}</span></span>
   <span class="text">
+    {evento.tipo && <span class="chip">{tr(`tipo_${evento.tipo}`)}</span>}
     <span class="title">{pick(evento.titolo, locale)}</span>
     {details && <span class="details">{details}</span>}
   </span>
 </a>
 
 <style>
-  .event { display: flex; gap: 14px; align-items: center; padding: 14px; }
+  .event { display: flex; gap: 14px; align-items: center; padding: 14px; overflow: hidden; }
   .date {
     flex: 0 0 70px; height: 84px; border-radius: 999px 999px 14px 14px;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-block-end: 10px;
-    color: #fff; background: linear-gradient(180deg, var(--bulb), #a10d25); font-weight: 800; line-height: 1;
+    color: #fff; background: linear-gradient(180deg, var(--bulb), #a10d25); font-weight: 800; line-height: 1; font-family: var(--sans);
   }
-  .day { font-size: 28px; }
+  .day { font-size: 28px; font-family: 'Bricolage Grotesque', var(--sans); }
   .month { font-size: 11px; text-transform: uppercase; margin-block-start: 4px; }
-  .text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .title { font-size: 22px; line-height: 1.1; font-weight: 800; letter-spacing: var(--track); overflow-wrap: anywhere; }
+  .text { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .chip {
+    align-self: flex-start; display: inline-flex; align-items: center; min-height: 24px; padding-inline: 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 800; background: #fde8eb; color: #a10d25;
+  }
+  .title { font-size: 21px; line-height: 1.1; font-weight: 800; letter-spacing: var(--track); overflow-wrap: anywhere; }
   .details { font-size: 15px; color: var(--muted); }
+  .poster { display: none; background: radial-gradient(60% 80% at 50% 30%, rgb(255 170 90 / 0.3), rgb(255 170 90 / 0) 70%), linear-gradient(180deg, var(--night), var(--red-deep)); }
+
+  /* Versione grande: locandina sopra, bollino a cavallo del bordo. */
+  .photo-always { position: relative; flex-direction: column; align-items: stretch; padding: 0; border-radius: 28px; }
+  .photo-always .poster { display: block; height: 190px; border-block-end: 2px solid var(--ink); }
+  .photo-always .date, .photo-desktop .date { flex: none; width: 70px; }
+  .photo-always .poster img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-always .date { position: absolute; inset-inline-start: 14px; top: 130px; height: 88px; box-shadow: 0 6px 14px rgb(0 0 0 / 0.18); }
+  .photo-always .text { padding: 14px 18px 18px; padding-inline-start: 100px; min-height: 70px; }
+  .photo-always .title { font-size: 24px; }
+  @media (min-width: 60rem) {
+    .photo-desktop { position: relative; flex-direction: column; align-items: stretch; padding: 0; border-radius: 30px; }
+    .photo-desktop .poster { display: block; height: 210px; border-block-end: 2px solid var(--ink); }
+    .photo-desktop .poster img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-desktop .date { position: absolute; inset-inline-start: 18px; top: 152px; height: 90px; box-shadow: 0 6px 14px rgb(0 0 0 / 0.18); }
+    .photo-desktop .text { padding: 16px 22px 22px; padding-inline-start: 106px; min-height: 84px; }
+    .photo-desktop .title { font-size: 26px; }
+  }
 </style>
