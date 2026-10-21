@@ -7,10 +7,12 @@
 // Regole:
 // - si traduce un campo solo se il testo italiano è cambiato dall'ultima traduzione;
 // - se qualcuno ha corretto a mano una traduzione, quella lingua non viene più toccata.
+// - una lingua che fallisce resta da tradurre e viene ripresa alla pubblicazione successiva.
 import type { APIRoute } from 'astro';
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient, type SanityDocument } from '@sanity/client';
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { waitUntil } from '@vercel/functions';
 
 export const prerender = false;
 
@@ -61,6 +63,8 @@ function findLocalized(node: unknown, path = '', out: LocalizedField[] = []): Lo
   return out;
 }
 
+// Una richiesta per lingua, tutte in parallelo: più veloce, e una pagina lunga non sfora il
+// limite di testo di una singola risposta.
 const OUTPUT_SCHEMA = {
   type: 'object',
   properties: {
@@ -68,11 +72,8 @@ const OUTPUT_SCHEMA = {
       type: 'array',
       items: {
         type: 'object',
-        properties: {
-          id: { type: 'string' },
-          ...Object.fromEntries(TARGETS.map((l) => [l, { type: 'string' }])),
-        },
-        required: ['id', ...TARGETS],
+        properties: { id: { type: 'string' }, text: { type: 'string' } },
+        required: ['id', 'text'],
         additionalProperties: false,
       },
     },
@@ -82,9 +83,9 @@ const OUTPUT_SCHEMA = {
 };
 
 const SYSTEM = `You translate content for the website of the Pro Loco of Presicce, a tourist association in a small village in Salento (Apulia, Italy). Readers are tourists visiting the village.
-Translate each Italian text into every requested language. Keep the meaning, tone and Markdown formatting (paragraph breaks, **bold**, *italic*, lists, links) exactly. Keep proper names of places, palaces, streets, churches and people in Italian (e.g. "Palazzo Adamo Izzo", "Via Crudili", "Frantoi Ipogei" may get a short explanation only if it is already in the text). Keep dates, times, prices and phone numbers unchanged in value, written the way a native reader expects. Return only the JSON.`;
+Translate each Italian text into the requested language. Keep the meaning, tone and Markdown formatting (paragraph breaks, **bold**, *italic*, lists, links) exactly. Keep proper names of places, palaces, streets, churches and people in Italian (e.g. "Palazzo Adamo Izzo", "Via Crudili", "Frantoi Ipogei" may get a short explanation only if it is already in the text). Keep dates, times, prices and phone numbers unchanged in value, written the way a native reader expects. Return only the JSON, with one entry per input id.`;
 
-async function translate(client: Anthropic, items: { id: string; it: string }[]) {
+async function translateTo(client: Anthropic, lang: Target, items: { id: string; it: string }[]) {
   const response = await client.beta.messages.create({
     model: 'claude-opus-5-5',
     max_tokens: 16000,
@@ -93,16 +94,11 @@ async function translate(client: Anthropic, items: { id: string; it: string }[])
     fallbacks: 'default',
     output_config: { effort: 'low', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
     system: SYSTEM,
-    messages: [
-      {
-        role: 'user',
-        content: `Languages: ${TARGETS.map((l) => `${l} = ${LANGUAGE_NAMES[l]}`).join(', ')}.\n\nTexts:\n${JSON.stringify(items)}`,
-      },
-    ],
+    messages: [{ role: 'user', content: `Language: ${LANGUAGE_NAMES[lang]}.\n\nTexts:\n${JSON.stringify(items)}` }],
   });
-  if (response.stop_reason !== 'end_turn') throw new Error(`Traduzione interrotta: ${response.stop_reason}`);
+  if (response.stop_reason !== 'end_turn') throw new Error(`Traduzione in ${lang} interrotta: ${response.stop_reason}`);
   const text = response.content.find((b) => b.type === 'text')?.text ?? '';
-  return (JSON.parse(text) as { translations: ({ id: string } & Record<Target, string>)[] }).translations;
+  return new Map((JSON.parse(text) as { translations: { id: string; text: string }[] }).translations.map((t) => [t.id, t.text]));
 }
 
 function authorized(request: Request) {
@@ -116,8 +112,16 @@ export const POST: APIRoute = async ({ request }) => {
 
   const { _id } = (await request.json()) as { _id?: string };
   if (!_id) return new Response('Manca _id', { status: 400 });
-  const id = _id.replace(/^drafts\./, '');
 
+  // Sanity aspetta la risposta solo pochi secondi e altrimenti ripete la chiamata: rispondiamo
+  // subito e traduciamo dopo (Vercel tiene viva la funzione fino alla fine del lavoro).
+  waitUntil(
+    handle(_id.replace(/^drafts\./, '')).catch((err) => console.error(`Traduzione di ${_id} fallita:`, err)),
+  );
+  return new Response('Ricevuto', { status: 202 });
+};
+
+async function handle(id: string) {
   const sanity = createClient({
     projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
     dataset: import.meta.env.PUBLIC_SANITY_DATASET ?? 'production',
@@ -126,7 +130,9 @@ export const POST: APIRoute = async ({ request }) => {
     useCdn: false,
   });
   const doc = await sanity.getDocument<SanityDocument & { traduzioniStato?: string }>(id);
-  if (!doc || !TRANSLATABLE_DOCS.has(doc._type)) return new Response('Niente da tradurre', { status: 200 });
+  // Documento cancellato: niente da tradurre, ma il sito va rigenerato per toglierlo.
+  if (!doc) return rebuild(`${id} cancellato`);
+  if (!TRANSLATABLE_DOCS.has(doc._type)) return;
 
   // Stato delle traduzioni salvato nel documento come JSON (campo nascosto nello Studio).
   const saved = JSON.parse(doc.traduzioniStato || '{}') as { at?: string; fields?: TranslationState };
@@ -150,37 +156,60 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (work.length > 0) {
     const anthropic = new Anthropic();
-    const results = await translate(
-      anthropic,
-      work.map((w) => ({ id: w.field.stateKey, it: w.field.value.it! })),
+    const langs = TARGETS.filter((l) => work.some((w) => w.langs.includes(l)));
+    const settled = await Promise.allSettled(
+      langs.map((l) =>
+        translateTo(
+          anthropic,
+          l,
+          work.filter((w) => w.langs.includes(l)).map((w) => ({ id: w.field.stateKey, it: w.field.value.it! })),
+        ),
+      ),
     );
-    const byId = new Map(results.map((r) => [r.id, r]));
+    // Una lingua andata male non blocca le altre: resta vuota e si ritraduce alla prossima pubblicazione.
+    const byLang = new Map<Target, Map<string, string>>();
+    settled.forEach((r, i) => {
+      if (r.status === 'fulfilled') byLang.set(langs[i], r.value);
+      else console.error(`Traduzione in ${langs[i]} di ${id} fallita:`, r.reason);
+    });
 
     const set: Record<string, string> = {};
     const newState = { ...state };
-    for (const { field, langs } of work) {
-      const tr = byId.get(field.stateKey);
-      if (!tr) continue;
-      const out = { ...(state[field.stateKey]?.out ?? {}) };
-      for (const l of langs) {
-        set[`${field.path}.${l}`] = tr[l];
-        out[l] = hash(tr[l]);
+    for (const { field, langs: fieldLangs } of work) {
+      const prevOut = state[field.stateKey]?.out ?? {};
+      const out: Record<string, string> = {};
+      for (const l of TARGETS) {
+        const tr = fieldLangs.includes(l) ? byLang.get(l)?.get(field.stateKey) : undefined;
+        if (tr) {
+          set[`${field.path}.${l}`] = tr;
+          out[l] = hash(tr);
+        } else if (field.value[l]) {
+          // Correzioni manuali (o lingue fallite) restano con il loro hash attuale.
+          out[l] = prevOut[l] ?? hash(field.value[l]!);
+        }
       }
-      // Le lingue non ritradotte (correzioni manuali) restano con il loro hash attuale.
-      for (const l of TARGETS) if (!langs.includes(l) && field.value[l]) out[l] = state[field.stateKey]?.out?.[l] ?? hash(field.value[l]!);
-      newState[field.stateKey] = { src: hash(field.value.it!), out };
+      // Se qualche lingua è fallita, il testo italiano resta "da tradurre" per quelle lingue.
+      const allDone = fieldLangs.every((l) => out[l] !== undefined);
+      newState[field.stateKey] = { src: allDone ? hash(field.value.it!) : (state[field.stateKey]?.src ?? ''), out };
     }
-    await sanity
-      .patch(id)
-      .set({ ...set, traduzioniStato: JSON.stringify({ at: new Date().toISOString(), fields: newState }) })
-      .commit();
+    if (Object.keys(set).length > 0) {
+      await sanity
+        .patch(id)
+        .set({ ...set, traduzioniStato: JSON.stringify({ at: new Date().toISOString(), fields: newState }) })
+        .commit();
+    }
+    console.log(`${id}: tradotti ${work.length} campi in ${byLang.size}/${langs.length} lingue`);
   }
 
-  // Rigenera il sito. Il nostro salvataggio qui sopra fa ripartire il webhook: quella seconda
-  // chiamata non ha niente da tradurre e arriva entro pochi secondi, quindi non rigenera di nuovo.
+  // Il nostro salvataggio qui sopra fa ripartire il webhook: quella seconda chiamata non ha
+  // niente da tradurre e arriva entro pochi secondi, quindi non rigenera di nuovo.
   const isEcho = work.length === 0 && saved.at && new Date(doc._updatedAt).getTime() - new Date(saved.at).getTime() < 30_000;
-  const hook = import.meta.env.VERCEL_DEPLOY_HOOK_URL;
-  if (hook && !isEcho) await fetch(hook, { method: 'POST' });
+  if (!isEcho) await rebuild(`${id} pubblicato`);
+}
 
-  return Response.json({ translatedFields: work.length });
-};
+async function rebuild(reason: string) {
+  const hook = import.meta.env.VERCEL_DEPLOY_HOOK_URL;
+  if (!hook) return console.warn(`Manca VERCEL_DEPLOY_HOOK_URL: il sito non si rigenera (${reason})`);
+  const res = await fetch(hook, { method: 'POST' });
+  console.log(`Rigenerazione chiesta (${reason}): ${res.status}`);
+}

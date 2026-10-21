@@ -18,6 +18,7 @@
     "@sanity/icons": "5.2.3",
     "@sanity/image-url": "2.1.1",
     "@sanity/locale-it-it": "1.1.36",
+    "@vercel/functions": "3.9.11",
     "@vercel/routing-utils": "6.6.0",
     "astro": "7.3.5",
     "marked": "18.1.0",

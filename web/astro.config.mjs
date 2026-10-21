@@ -13,7 +13,7 @@ export default defineConfig({
   trailingSlash: 'always',
   // Tutte le pagine sono statiche; girano come funzioni Vercel solo /api/* e l'area riservata /admin.
   output: 'static',
-  adapter: vercel({ maxDuration: 60 }),
+  adapter: vercel({ maxDuration: 300 }),
   i18n: {
     defaultLocale: 'it',
     locales,
