@@ -1,5 +1,6 @@
 ---
 // Pulsanti per prenotare: il sito non vende nulla online, si prenota solo per telefono o WhatsApp.
+// tone="night" è la versione bianca per gli sfondi scuri (testata della home).
 import type { Locale } from '../i18n/config';
 import { t } from '../i18n/ui';
 import { telHref, whatsappHref } from '../lib/format';
@@ -9,21 +10,32 @@ interface Props {
   phone?: string;
   whatsapp?: string;
   calendar?: string;
+  tone?: 'light' | 'night';
 }
 
-const { locale, phone, whatsapp, calendar } = Astro.props;
+const { locale, phone, whatsapp, calendar, tone = 'light' } = Astro.props;
 const tr = t(locale);
+const short = tone === 'night';
 ---
 
-<div class="booking">
-  {phone && <a class="button" href={telHref(phone)}>{tr('callToBook')}</a>}
-  {whatsapp && <a class="button secondary" href={whatsappHref(whatsapp)} rel="noopener">{tr('whatsapp')}</a>}
-  {calendar && <a class="button secondary" href={calendar} rel="noopener">{tr('addToCalendar')}</a>}
+<div class:list={['booking', `tone-${tone}`]}>
+  {phone && (
+    <a class="btn primary" href={telHref(phone)}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></svg>
+      {short ? tr('call') : tr('callToBook')}
+    </a>
+  )}
+  {whatsapp && <a class="btn secondary" href={whatsappHref(whatsapp)} rel="noopener">{short ? 'WhatsApp' : tr('whatsapp')}</a>}
+  {calendar && <a class="btn secondary" href={calendar} rel="noopener">{tr('addToCalendar')}</a>}
 </div>
 
 <style>
-  .booking { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-block: 1.5rem; }
-  @media (max-width: 30rem) {
-    .booking .button { flex: 1 1 100%; }
+  .booking { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); margin-block: 1.25rem; }
+  .tone-night { margin-block: 4px 0; }
+  .tone-night .primary { background: #fff; color: var(--red); }
+  .tone-night .secondary { border-color: #fff; color: #fff; background: transparent; }
+  @media (min-width: 40rem) {
+    .tone-light { display: flex; flex-wrap: wrap; }
+    .tone-light .btn { padding-inline: 1.5rem; }
   }
 </style>

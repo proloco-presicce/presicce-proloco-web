@@ -1,7 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import BookingButtons from '../../../components/BookingButtons.astro';
-import { langParam, locales, type Locale } from '../../../i18n/config';
+import { langParam, locales, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
 import { getEventi, getImpostazioni, image, isFallback, markdown, pick, type Evento } from '../../../lib/content';
 import { calendarHref, formatDate } from '../../../lib/format';
@@ -34,12 +34,12 @@ const jsonLd = {
 ---
 
 <Base locale={locale} title={titolo} description={descrizione.slice(0, 160)} image={img?.src} autoTranslated={isFallback(evento.descrizione, locale)}>
-  <article class="prose">
+  <article class="evento">
+    <p class="eyebrow"><a href={path(locale, '/eventi/')}>{tr('navEvents')}</a></p>
     <h1>{titolo}</h1>
-    <dl>
-      <dt>{tr('when')}</dt>
-      <dd>{formatDate(evento.dataInizio, locale, true)}{evento.dataFine && ` – ${formatDate(evento.dataFine, locale, true)}`}</dd>
-      {evento.luogo && <><dt>{tr('where')}</dt><dd>{evento.luogo}</dd></>}
+    <dl class="card info">
+      <div><dt>{tr('when')}</dt><dd>{formatDate(evento.dataInizio, locale, true)}{evento.dataFine && ` – ${formatDate(evento.dataFine, locale, true)}`}</dd></div>
+      {evento.luogo && <div><dt>{tr('where')}</dt><dd>{evento.luogo}</dd></div>}
     </dl>
     <BookingButtons
       locale={locale}
@@ -47,15 +47,23 @@ const jsonLd = {
       whatsapp={evento.whatsapp || impostazioni.whatsapp}
       calendar={calendarHref(titolo, evento.dataInizio, evento.dataFine, evento.luogo)}
     />
-    {img && <img src={img.src} alt={img.alt || titolo} width="1200" height="1600" />}
-    <div set:html={markdown(evento.descrizione, locale)} />
+    <div class="body">
+      {img && <img class="poster" src={img.src} alt={img.alt || titolo} width="1200" height="1600" />}
+      <div class="prose" set:html={markdown(evento.descrizione, locale)} />
+    </div>
   </article>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 </Base>
 
 <style>
-  dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; }
-  dt { font-weight: 600; color: var(--muted); }
-  dd { margin: 0; }
-  img { margin-block: 1.5rem; }
+  .evento h1 { font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1; max-width: 48rem; overflow-wrap: anywhere; }
+  .info { margin: 24px 0 0; padding: 16px 20px; display: grid; gap: 12px; max-width: 42rem; }
+  .info dt { font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); }
+  .info dd { margin: 0; font-size: 18px; font-weight: 700; }
+  .info dd::first-letter { text-transform: uppercase; }
+  .body { display: grid; gap: 24px; margin-block-start: 8px; }
+  .poster { border-radius: 26px; border: 2px solid var(--ink); width: 100%; max-width: 30rem; }
+  @media (min-width: 60rem) {
+    .body { grid-template-columns: minmax(0, 26rem) minmax(0, 1fr); align-items: start; }
+  }
 </style>

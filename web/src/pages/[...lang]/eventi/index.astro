@@ -1,5 +1,6 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import Accent from '../../../components/Accent.astro';
 import EventCard from '../../../components/EventCard.astro';
 import { localePaths, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
@@ -13,19 +14,21 @@ const { prossimi, passati } = splitEventi(await getEventi());
 ---
 
 <Base locale={locale} title={tr('navEvents')}>
-  <h1>{tr('upcomingEvents')}</h1>
-  {prossimi.length ? <div class="grid">{prossimi.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p>{tr('noEvents')}</p>}
+  <div class="section-title"><h1><Accent text={tr('homeEvents')} /></h1><span class="bulbs" aria-hidden="true"></span></div>
+  <h2 class="sub">{tr('upcomingEvents')}</h2>
+  {prossimi.length ? <div class="cards">{prossimi.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p class="empty">{tr('noEvents')}</p>}
 
   {
     passati.length > 0 && (
       <>
-        <h2>{tr('pastEvents')}</h2>
-        <div class="grid past">{passati.map((evento) => <EventCard evento={evento} locale={locale} />)}</div>
+        <h2 class="sub">{tr('pastEvents')}</h2>
+        <div class="cards past">{passati.map((evento) => <EventCard evento={evento} locale={locale} />)}</div>
       </>
     )
   }
 </Base>
 
 <style>
-  .past { opacity: 0.75; }
+  .sub { font-size: 22px; letter-spacing: var(--track); margin-block: 32px 16px; }
+  .past { opacity: 0.7; }
 </style>

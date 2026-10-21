@@ -1,10 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Accent from '../../components/Accent.astro';
 import EventCard from '../../components/EventCard.astro';
 import BookingButtons from '../../components/BookingButtons.astro';
+import Luminaria from '../../components/Luminaria.astro';
 import { localePaths, path, type Locale } from '../../i18n/config';
 import { t } from '../../i18n/ui';
-import { getEventi, getImpostazioni, getStazioni, image, isFallback, markdown, pick, splitEventi } from '../../lib/content';
+import { getEventi, getImpostazioni, getStazioni, image, pick, splitEventi } from '../../lib/content';
+import { dateBadge, telHref } from '../../lib/format';
+import { Image, getImage } from 'astro:assets';
+import { foto, fotoTappa } from '../../lib/foto';
 
 export const getStaticPaths = localePaths;
 
@@ -13,41 +18,136 @@ const tr = t(locale);
 const impostazioni = await getImpostazioni();
 const { prossimi } = splitEventi(await getEventi());
 const inEvidenza = prossimi.filter((e) => e.inEvidenza !== false).slice(0, 3);
-const stazioni = (await getStazioni()).slice(0, 3);
-const hero = image(impostazioni.heroImmagine, locale, 1600);
+const prossimo = prossimi[0];
+const badge = prossimo && dateBadge(prossimo.dataInizio, locale);
+
+// In home tre luoghi che chi arriva riconosce subito: frantoi, corti e Chiesa Madre.
+// Se in Sanity cambiano gli slug, si ripiega sulle prime tappe del percorso.
+const stazioni = await getStazioni();
+const preferiti = ['frantoi-ipogei', 'case-a-corte', 'santandrea-e-chiesa-madre']
+  .map((slug) => stazioni.find((s) => s.slug.current === slug))
+  .filter((s) => !!s);
+const luoghi = (preferiti.length === 3 ? preferiti : stazioni.slice(0, 3)).map((s) => ({
+  href: path(locale, `/luoghi-storici/${s.slug.current}/`),
+  title: pick(s.titolo, locale),
+  local: fotoTappa[s.slug.current],
+  img: image(s.immagini?.[0], locale, 480),
+}));
+// Sfondo del riquadro "Visite guidate": la campagna con il convento degli Angeli, velata di rosso.
+const toursBg = await getImage({ src: foto.campagna, width: 900, format: 'webp' });
 ---
 
-<Base locale={locale} title={tr('siteName')} description={pick(impostazioni.heroTesto, locale)} autoTranslated={isFallback(impostazioni.heroTitolo, locale)}>
-  <section class="hero">
-    {hero && <img src={hero.src} alt={hero.alt} width="1600" height="900" fetchpriority="high" />}
-    <p class="eyebrow">{tr('tagline')}</p>
-    <h1>{pick(impostazioni.heroTitolo, locale)}</h1>
-    <div class="prose" set:html={markdown(impostazioni.heroTesto, locale)} />
-    <BookingButtons locale={locale} phone={impostazioni.telefono} whatsapp={impostazioni.whatsapp} />
+<Base locale={locale} title={tr('siteName')} description={tr('heroText')}>
+  <section slot="hero" class="hero wrap">
+    <div class="art"><Luminaria label={tr('luminariaAlt')} /></div>
+    <div class="copy">
+      {prossimo && badge && (
+        <a class="sticker" href={path(locale, `/eventi/${prossimo.slug.current}/`)}>
+          <span class="s-label">{tr('next')}</span>
+          <span class="s-day">{badge.day}</span>
+          <span class="s-month">{badge.month.replace('.', '')}</span>
+        </a>
+      )}
+      <h1>Presicce <span class="it">{tr('heroSubtitle')}</span></h1>
+      <p class="intro">{tr('heroText')}</p>
+      <p class="book">{tr('heroBook')}</p>
+      <BookingButtons locale={locale} phone={impostazioni.telefono} whatsapp={impostazioni.whatsapp} tone="night" />
+    </div>
   </section>
 
-  <section>
-    <h2>{tr('upcomingEvents')}</h2>
-    {inEvidenza.length ? <div class="grid">{inEvidenza.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p>{tr('noEvents')}</p>}
-    <p><a href={path(locale, '/eventi/')}>{tr('allEvents')} →</a></p>
+  <section class="block">
+    <div class="section-title"><h2><Accent text={tr('homeEvents')} /></h2><span class="bulbs" aria-hidden="true"></span></div>
+    {inEvidenza.length ? <div class="cards">{inEvidenza.map((evento) => <EventCard evento={evento} locale={locale} />)}</div> : <p class="empty">{tr('noEvents')}</p>}
+    <a class="more" href={path(locale, '/eventi/')}>{tr('calendar')} <span class="arrow" aria-hidden="true">→</span></a>
   </section>
 
-  {stazioni.length > 0 && <section>
-    <h2>{tr('navPlaces')}</h2>
-    <ul class="grid stops">
-      {stazioni.map((s) => (
-        <li class="card"><a class="card-body" href={path(locale, `/luoghi-storici/${s.slug.current}/`)}><strong>{pick(s.titolo, locale)}</strong><br />{pick(s.sottotitolo, locale)}</a></li>
-      ))}
-    </ul>
-    <p><a href={path(locale, '/luoghi-storici/')}>{tr('discover')} →</a></p>
-  </section>}
+  {luoghi.length > 0 && (
+    <section class="block">
+      <div class="section-title"><h2><Accent text={tr('homePlaces')} /></h2><span class="bulbs" aria-hidden="true"></span></div>
+      <p class="lead">{tr('placesIntro').replace('{n}', String(stazioni.length))}</p>
+      <ul class="places">
+        {luoghi.map((l) => (
+          <li>
+            <a href={l.href}>
+              <span class="arch"><span class="photo">{l.local ? <Image src={l.local} alt="" widths={[200, 400, 600]} sizes="(min-width: 72rem) 22rem, 30vw" loading="lazy" /> : l.img && <img src={l.img.src} alt="" loading="lazy" width="480" height="640" />}</span></span>
+              <span class="p-title">{l.title}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a class="btn outline guide" href={path(locale, '/luoghi-storici/')}>{tr('openGuide')}</a>
+    </section>
+  )}
+
+  {impostazioni.telefono && (
+    <section class="tours" style={`--tours-bg: url(${toursBg.src})`}>
+      <span class="eyebrow">{tr('toursEyebrow')}</span>
+      <h2><Accent text={tr('toursTitle')} /></h2>
+      <p>{tr('toursText')}</p>
+      <a class="btn" href={telHref(impostazioni.telefono)}>{tr('bookTour')}</a>
+    </section>
+  )}
 </Base>
 
 <style>
-  .hero { padding-block: 1rem 2rem; }
-  .hero img { aspect-ratio: 16 / 9; object-fit: cover; width: 100%; margin-block-end: 1.5rem; }
-  .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
-  h1 { font-size: clamp(1.8rem, 6vw, 3rem); margin-block: 0.25rem 0.75rem; }
-  .stops { list-style: none; padding: 0; }
-  .stops a { display: block; color: inherit; text-decoration: none; }
+  .hero { display: grid; gap: 0; padding-block-start: 4px; }
+  .art { margin-inline: calc(var(--gutter) * -1); max-width: 34rem; }
+  .copy { position: relative; display: flex; flex-direction: column; gap: 12px; padding-block-start: 18px; }
+  .sticker {
+    position: absolute; inset-inline-end: -2px; top: -46px; width: 78px; height: 78px; border-radius: 999px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.05;
+    background: #fff; color: var(--red); font-weight: 800; text-decoration: none; text-transform: uppercase;
+    transform: rotate(10deg); box-shadow: 0 8px 20px rgb(0 0 0 / 0.3);
+  }
+  .sticker:hover { color: var(--red-dark); transform: rotate(4deg) scale(1.04); }
+  .s-label { font-size: 10px; letter-spacing: 0.02em; }
+  .s-day { font-size: 24px; line-height: 1; }
+  .s-month { font-size: 12px; }
+  .hero h1 { font-size: clamp(3.4rem, 17vw, 5.5rem); line-height: 0.9; letter-spacing: -0.045em; }
+  .hero h1 .it { display: block; margin-block-start: 8px; font-size: clamp(2.1rem, 9.6vw, 3.2rem); line-height: 1.05; color: var(--light); letter-spacing: -0.01em; }
+  :global(:root:is(:lang(ar), :lang(zh), :lang(ja), :lang(el))) .hero h1 .it { font-size: clamp(1.8rem, 8vw, 2.8rem); line-height: 1.25; }
+  :global(:root:is(:lang(ar), :lang(zh), :lang(ja))) .hero h1 { letter-spacing: 0; line-height: 1.1; }
+  .intro { margin: 0; font-size: 18px; line-height: 1.4; color: rgb(255 255 255 / 0.92); max-width: 34rem; }
+  .book { margin: 0; font-size: 18px; line-height: 1.35; font-weight: 800; color: var(--gold); max-width: 34rem; }
+
+  .block { display: flex; flex-direction: column; gap: 16px; margin-block-start: 44px; }
+  .more { align-self: center; font-weight: 800; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
+  :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
+
+  .places { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; text-align: center; }
+  .places a { display: flex; flex-direction: column; gap: 8px; color: var(--ink); text-decoration: none; }
+  .places a:hover .arch { border-color: var(--red-dark); }
+  .arch { padding: 4px; border: 3px dotted var(--bulb); border-radius: 999px 999px 16px 16px; }
+  .photo { display: block; height: 140px; border-radius: 999px 999px 12px 12px; overflow: hidden; background: var(--ph); }
+  .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .p-title { font-weight: 800; font-size: 15px; line-height: 1.2; }
+  .guide { width: 100%; }
+
+  .tours {
+    margin: 44px auto 0; max-width: 40rem; padding: 70px 22px 28px; border-radius: 999px 999px 30px 30px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; color: #fff;
+    background: radial-gradient(70% 50% at 50% 0%, rgb(255 77 99 / 0.7) 0%, rgb(255 77 99 / 0) 70%), linear-gradient(180deg, rgb(200 16 46 / 0.62) 0%, rgb(122 10 28 / 0.9) 70%), var(--tours-bg) center / cover, var(--red);
+    outline: 4px dotted var(--gold); outline-offset: -12px;
+  }
+  .tours .eyebrow { color: #ffd3d9; margin: 0; }
+  .tours h2 { font-size: 32px; line-height: 1.05; letter-spacing: -0.03em; }
+  .tours h2 :global(.it) { color: var(--light); }
+  .tours p { margin: 0; color: rgb(255 255 255 / 0.9); }
+  .tours .btn { width: 100%; background: #fff; color: var(--red); }
+
+  @media (min-width: 40rem) {
+    .places { gap: 18px; }
+    .photo { height: 220px; }
+    .p-title { font-size: 17px; }
+    .guide { width: auto; align-self: center; padding-inline: 2rem; }
+  }
+
+  /* Da computer: luminaria a fianco del testo, sotto la barra. */
+  @media (min-width: 60rem) {
+    .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 30rem); align-items: end; column-gap: 48px; padding-block-start: 12px; }
+    .art { order: 2; margin-inline: 0; }
+    .copy { padding-block: 0 12px; }
+    .sticker { top: -96px; inset-inline-end: auto; inset-inline-start: 0; }
+    .places .photo { height: 280px; }
+  }
 </style>

@@ -3,6 +3,8 @@ import Base from '../../../layouts/Base.astro';
 import Gallery from '../../../components/Gallery.astro';
 import { langParam, locales, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
+import { Image as Picture } from 'astro:assets';
+import { fotoTappa } from '../../../lib/foto';
 import { getStazioni, image, isFallback, markdown, pick, type Image, type Stazione } from '../../../lib/content';
 
 export async function getStaticPaths() {
@@ -17,25 +19,43 @@ export async function getStaticPaths() {
 
 const { locale, stazione, prev, next } = Astro.props as { locale: Locale; stazione: Stazione; prev: Stazione | null; next: Stazione | null };
 const tr = t(locale);
+const total = (await getStazioni()).length;
+const local = fotoTappa[stazione.slug.current];
 const images = (stazione.immagini ?? []).map((i) => image(i, locale)).filter((i): i is Image => !!i);
 ---
 
 <Base locale={locale} title={pick(stazione.titolo, locale)} description={pick(stazione.sottotitolo, locale)} image={images[0]?.src} autoTranslated={isFallback(stazione.testo, locale)}>
-  <p class="eyebrow"><a href={path(locale, '/luoghi-storici/')}>{tr('navPlaces')}</a> · {stazione.ordine}</p>
-  <h1>{pick(stazione.titolo, locale)}</h1>
-  <p class="subtitle">{pick(stazione.sottotitolo, locale)}</p>
-  <div class="prose" set:html={markdown(stazione.testo, locale)} />
-  <Gallery images={images} />
-  <nav class="pager">
-    {prev && <a rel="prev" href={path(locale, `/luoghi-storici/${prev.slug.current}/`)}>← {pick(prev.titolo, locale)}</a>}
-    {next && <a rel="next" href={path(locale, `/luoghi-storici/${next.slug.current}/`)}>{pick(next.titolo, locale)} →</a>}
+  <article class="tappa">
+    <p class="eyebrow"><a href={path(locale, '/luoghi-storici/')}>{tr('navPlaces')}</a> · {stazione.ordine}/{total}</p>
+    <h1>{pick(stazione.titolo, locale)}</h1>
+    <p class="lead">{pick(stazione.sottotitolo, locale)}</p>
+    {local ? (
+      <figure class="cover">
+        <span class="arch"><Picture src={local} alt={pick(stazione.titolo, locale)} widths={[480, 900, 1400]} sizes="(min-width: 42rem) 42rem, 100vw" fetchpriority="high" loading="eager" /></span>
+      </figure>
+    ) : images[0] && (
+      <figure class="cover">
+        <span class="arch"><img src={images[0].src} alt={images[0].alt} width="1200" height="900" fetchpriority="high" /></span>
+        {images[0].caption && <figcaption>{images[0].caption}</figcaption>}
+      </figure>
+    )}
+    <div class="prose" set:html={markdown(stazione.testo, locale)} />
+    <Gallery images={local ? images : images.slice(1)} />
+  </article>
+  <nav class="pager" aria-label={tr('stops')}>
+    {prev && <a class="btn secondary" rel="prev" href={path(locale, `/luoghi-storici/${prev.slug.current}/`)}><span class="arrow" aria-hidden="true">←</span> {pick(prev.titolo, locale)}</a>}
+    {next && <a class="btn outline" rel="next" href={path(locale, `/luoghi-storici/${next.slug.current}/`)}>{pick(next.titolo, locale)} <span class="arrow" aria-hidden="true">→</span></a>}
   </nav>
 </Base>
 
 <style>
-  .eyebrow { color: var(--accent); font-weight: 600; margin: 0; }
-  .subtitle { color: var(--muted); font-size: 1.15rem; }
-  .pager { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-block-start: 2rem; }
-  .pager a { min-height: 44px; display: inline-flex; align-items: center; }
-  :global([dir='rtl']) .pager a { unicode-bidi: plaintext; }
+  .tappa h1 { font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1; max-width: 48rem; }
+  .cover { margin: 24px 0; max-width: 42rem; }
+  .cover .arch { display: block; padding: 5px; border: 3px dotted var(--bulb); border-radius: 999px 999px 22px 22px; }
+  .cover img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 999px 999px 18px 18px; background: var(--ph); }
+  figcaption { color: var(--muted); font-size: 0.9rem; margin-block-start: 0.5rem; }
+  .pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-block-start: 2.5rem; }
+  .pager .btn { flex: 1 1 14rem; }
+  .pager [rel='next'] { margin-inline-start: auto; }
+  :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
 </style>
