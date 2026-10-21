@@ -44,7 +44,6 @@ interface RawEvento {
 }
 
 interface RawImpostazioni {
-  presepeAttivo?: boolean;
   heroTitolo?: Localized;
   heroTesto?: Localized;
   heroImmagine?: RawImage;

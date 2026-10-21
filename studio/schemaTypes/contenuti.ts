@@ -16,10 +16,10 @@ const slug = defineField({
 const testo = defineField({ name: 'testo', title: 'Testo', type: 'testoLocalizzato' });
 const immagini = defineField({ name: 'immagini', title: 'Immagini', type: 'array', of: [{ type: 'immagineConDidascalia' }] });
 
-/** Una tappa del percorso del Presepe Vivente. */
+/** Un luogo della guida ai luoghi storici del borgo (i QR code lungo le strade portano qui). */
 export const stazione = defineType({
   name: 'stazione',
-  title: 'Tappa del Presepe',
+  title: 'Luogo storico',
   type: 'document',
   icon: PinIcon,
   fields: [
@@ -35,7 +35,7 @@ export const stazione = defineType({
   preview: { select: { title: 'titolo.it', ordine: 'ordine' }, prepare: ({ title, ordine }) => ({ title: `${ordine ?? '?'}. ${title}` }) },
 });
 
-/** Pagina libera: introduzione al Presepe, visite guidate, chi siamo... */
+/** Pagina libera: introduzione alla guida, visite guidate, chi siamo... */
 export const pagina = defineType({
   name: 'pagina',
   title: 'Pagina',
@@ -52,14 +52,6 @@ export const impostazioni = defineType({
   type: 'document',
   icon: CogIcon,
   fields: [
-    defineField({
-      name: 'presepeAttivo',
-      title: 'Presepe Vivente attivo',
-      type: 'boolean',
-      initialValue: false,
-      description:
-        'Accendilo nel periodo di Natale: il Presepe compare nel menu e in home. Da spento le pagine delle tappe restano raggiungibili dai QR code, ma non si vedono nel sito né su Google.',
-    }),
     defineField({ name: 'heroTitolo', title: 'Titolo della home', type: 'stringaLocalizzata' }),
     defineField({ name: 'heroTesto', title: 'Testo di benvenuto', type: 'testoLocalizzato' }),
     defineField({ name: 'heroImmagine', title: 'Foto di apertura', type: 'immagineConDidascalia' }),

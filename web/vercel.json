@@ -4,7 +4,9 @@
     { "source": "/segnala-evento/", "destination": "/admin/", "permanent": true },
     { "source": "/eventi-cpt/:slug/", "destination": "/eventi/:slug/", "permanent": true },
     { "source": "/eventi-cpt/:slug", "destination": "/eventi/:slug/", "permanent": true },
-    { "source": "/presepe-vivente/menu/", "destination": "/presepe-vivente/", "permanent": true },
+    { "source": "/presepe-vivente/menu/", "destination": "/luoghi-storici/", "permanent": true },
+    { "source": "/presepe-vivente/:path*", "destination": "/luoghi-storici/:path*", "permanent": true },
+    { "source": "/:lang(en|fr|es|de|el|sq|ar|zh|ja)/presepe-vivente/:path*", "destination": "/:lang/luoghi-storici/:path*", "permanent": true },
     { "source": "/:path*", "has": [{ "type": "host", "value": "www.presicceproloco.org" }], "destination": "https://presicceproloco.org/:path*", "permanent": true }
   ]
 }

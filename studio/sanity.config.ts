@@ -22,7 +22,7 @@ export default defineConfig({
           .items([
             S.documentTypeListItem('evento').title('Eventi'),
             S.divider(),
-            S.documentTypeListItem('stazione').title('Presepe Vivente: tappe'),
+            S.documentTypeListItem('stazione').title('Guida: luoghi storici'),
             S.documentTypeListItem('pagina').title('Pagine'),
             S.divider(),
             S.listItem()

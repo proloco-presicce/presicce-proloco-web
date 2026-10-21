@@ -13,7 +13,7 @@ const tr = t(locale);
 const impostazioni = await getImpostazioni();
 const { prossimi } = splitEventi(await getEventi());
 const inEvidenza = prossimi.filter((e) => e.inEvidenza !== false).slice(0, 3);
-const stazioni = impostazioni.presepeAttivo ? (await getStazioni()).slice(0, 3) : [];
+const stazioni = (await getStazioni()).slice(0, 3);
 const hero = image(impostazioni.heroImmagine, locale, 1600);
 ---
 
@@ -33,13 +33,13 @@ const hero = image(impostazioni.heroImmagine, locale, 1600);
   </section>
 
   {stazioni.length > 0 && <section>
-    <h2>{tr('navNativity')}</h2>
+    <h2>{tr('navPlaces')}</h2>
     <ul class="grid stops">
       {stazioni.map((s) => (
-        <li class="card"><a class="card-body" href={path(locale, `/presepe-vivente/${s.slug.current}/`)}><strong>{pick(s.titolo, locale)}</strong><br />{pick(s.sottotitolo, locale)}</a></li>
+        <li class="card"><a class="card-body" href={path(locale, `/luoghi-storici/${s.slug.current}/`)}><strong>{pick(s.titolo, locale)}</strong><br />{pick(s.sottotitolo, locale)}</a></li>
       ))}
     </ul>
-    <p><a href={path(locale, '/presepe-vivente/')}>{tr('discover')} →</a></p>
+    <p><a href={path(locale, '/luoghi-storici/')}>{tr('discover')} →</a></p>
   </section>}
 </Base>
 

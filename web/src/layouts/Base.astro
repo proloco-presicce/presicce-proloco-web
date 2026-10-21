@@ -25,8 +25,7 @@ const fullTitle = title === tr('siteName') ? title : `${title} · ${tr('siteName
 const nav = [
   { href: path(locale, '/'), label: tr('navHome') },
   { href: path(locale, '/eventi/'), label: tr('navEvents') },
-  // Il Presepe Vivente compare nel menu solo nel periodo di Natale (interruttore nelle impostazioni).
-  ...(impostazioni.presepeAttivo ? [{ href: path(locale, '/presepe-vivente/'), label: tr('navNativity') }] : []),
+  { href: path(locale, '/luoghi-storici/'), label: tr('navPlaces') },
   { href: '#contatti', label: tr('navContact') },
 ];
 ---
