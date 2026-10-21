@@ -3,7 +3,7 @@
   "short_name": "Presicce",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf6ef",
-  "theme_color": "#8a6a3b",
+  "background_color": "#fff8f5",
+  "theme_color": "#1e0409",
   "icons": []
 }

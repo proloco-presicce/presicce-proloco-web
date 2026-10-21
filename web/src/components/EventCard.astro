@@ -1,7 +1,8 @@
 ---
+// Card evento della proposta E: bollino ad arco con la data, titolo e giorno · luogo.
 import { path, type Locale } from '../i18n/config';
-import { image, pick, type Evento } from '../lib/content';
-import { dateBadge } from '../lib/format';
+import { pick, type Evento } from '../lib/content';
+import { dateBadge, weekday } from '../lib/format';
 
 interface Props {
   evento: Evento;
@@ -9,26 +10,28 @@ interface Props {
 }
 
 const { evento, locale } = Astro.props;
-const img = image(evento.immagine, locale, 800);
 const badge = dateBadge(evento.dataInizio, locale);
+const details = [weekday(evento.dataInizio, locale), evento.luogo].filter(Boolean).join(' · ');
 ---
 
-<article class="card event">
-  <a href={path(locale, `/eventi/${evento.slug.current}/`)}>
-    {img && <img src={img.src} alt={img.alt} loading="lazy" width="800" height="600" />}
-    <div class="card-body">
-      <p class="badge"><span>{badge.day}</span> {badge.month}</p>
-      <h3>{pick(evento.titolo, locale)}</h3>
-      {evento.luogo && <p class="place">{evento.luogo}</p>}
-    </div>
-  </a>
-</article>
+<a class="card event" href={path(locale, `/eventi/${evento.slug.current}/`)}>
+  <span class="date"><span class="day">{badge.day}</span><span class="month">{badge.month.replace('.', '')}</span></span>
+  <span class="text">
+    <span class="title">{pick(evento.titolo, locale)}</span>
+    {details && <span class="details">{details}</span>}
+  </span>
+</a>
 
 <style>
-  a { color: inherit; text-decoration: none; display: block; }
-  img { border-radius: 0; aspect-ratio: 4 / 3; object-fit: cover; width: 100%; }
-  .badge { margin: 0; color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
-  .badge span { font-size: 1.4rem; }
-  h3 { margin: 0.25rem 0; }
-  .place { margin: 0; color: var(--muted); }
+  .event { display: flex; gap: 14px; align-items: center; padding: 14px; }
+  .date {
+    flex: 0 0 70px; height: 84px; border-radius: 999px 999px 14px 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-block-end: 10px;
+    color: #fff; background: linear-gradient(180deg, var(--bulb), #a10d25); font-weight: 800; line-height: 1;
+  }
+  .day { font-size: 28px; }
+  .month { font-size: 11px; text-transform: uppercase; margin-block-start: 4px; }
+  .text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .title { font-size: 22px; line-height: 1.1; font-weight: 800; letter-spacing: var(--track); overflow-wrap: anywhere; }
+  .details { font-size: 15px; color: var(--muted); }
 </style>

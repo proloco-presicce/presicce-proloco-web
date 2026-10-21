@@ -1,5 +1,6 @@
 ---
 import Base from '../../../layouts/Base.astro';
+import Accent from '../../../components/Accent.astro';
 import Gallery from '../../../components/Gallery.astro';
 import { localePaths, path, type Locale } from '../../../i18n/config';
 import { t } from '../../../i18n/ui';
@@ -15,23 +16,44 @@ const images = (intro?.immagini ?? []).map((i) => image(i, locale)).filter((i): 
 ---
 
 <Base locale={locale} title={pick(intro?.titolo, locale) || tr('navPlaces')} description={pick(intro?.sottotitolo, locale)} autoTranslated={isFallback(intro?.testo, locale)}>
-  <h1>{pick(intro?.titolo, locale) || tr('navPlaces')}</h1>
-  {intro?.sottotitolo && <p class="subtitle">{pick(intro.sottotitolo, locale)}</p>}
+  <div class="section-title"><h1>{pick(intro?.titolo, locale) || <Accent text={tr('homePlaces')} />}</h1><span class="bulbs" aria-hidden="true"></span></div>
+  <p class="lead">{intro?.sottotitolo ? pick(intro.sottotitolo, locale) : tr('placesIntro').replace('{n}', String(stazioni.length))}</p>
 
-  <h2>{tr('stops')}</h2>
-  <ol class="stops">
-    {stazioni.map((s) => (
-      <li><a href={path(locale, `/luoghi-storici/${s.slug.current}/`)}><strong>{pick(s.titolo, locale)}</strong><span>{pick(s.sottotitolo, locale)}</span></a></li>
-    ))}
+  <h2 class="sub">{tr('stops')}</h2>
+  <ol class="cards stops">
+    {stazioni.map((s) => {
+      const img = image(s.immagini?.[0], locale, 240);
+      return (
+        <li class="card">
+          <a href={path(locale, `/luoghi-storici/${s.slug.current}/`)}>
+            <span class="arch">{img ? <img src={img.src} alt="" loading="lazy" width="240" height="300" /> : <span class="n">{s.ordine}</span>}</span>
+            <span class="text">
+              <span class="step">{s.ordine}</span>
+              <strong>{pick(s.titolo, locale)}</strong>
+              <span class="sottotitolo">{pick(s.sottotitolo, locale)}</span>
+            </span>
+          </a>
+        </li>
+      );
+    })}
   </ol>
 
-  {intro && <div class="prose" set:html={markdown(intro.testo, locale)} />}
+  {intro && <div class="prose intro" set:html={markdown(intro.testo, locale)} />}
   <Gallery images={images} />
 </Base>
 
 <style>
-  .subtitle { color: var(--muted); font-size: 1.15rem; }
-  .stops { padding-inline-start: 1.5rem; display: grid; gap: 0.5rem; }
-  .stops a { display: flex; flex-direction: column; padding-block: 0.5rem; text-decoration: none; color: var(--text); min-height: 44px; }
-  .stops span { color: var(--muted); font-size: 0.95rem; }
+  .sub { font-size: 22px; letter-spacing: var(--track); margin-block: 32px 16px; }
+  .stops { list-style: none; margin: 0; padding: 0; }
+  .stops a { display: flex; gap: 14px; align-items: center; padding: 12px; color: var(--ink); text-decoration: none; min-height: 44px; }
+  .arch {
+    flex: 0 0 70px; height: 88px; border-radius: 999px 999px 14px 14px; overflow: hidden; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, var(--bulb), #a10d25); color: #fff; font-weight: 800; font-size: 28px;
+  }
+  .arch img { width: 100%; height: 100%; object-fit: cover; }
+  .text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .step { font-size: 13px; font-weight: 800; color: var(--red); }
+  strong { font-size: 20px; line-height: 1.15; letter-spacing: var(--track); }
+  .sottotitolo { color: var(--muted); font-size: 15px; line-height: 1.35; }
+  .intro { margin-block-start: 40px; }
 </style>

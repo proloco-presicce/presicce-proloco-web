@@ -10,9 +10,9 @@ const { locale } = Astro.props;
 const current = stripLocale(Astro.url.pathname);
 ---
 
-<details class="lang">
-  <summary aria-label={t(locale)('language')}>{localeNames[locale]}</summary>
-  <ul>
+<details class="lang popover">
+  <summary aria-label={`${t(locale)('language')}: ${localeNames[locale]}`}>{locale.toUpperCase()}</summary>
+  <ul class="panel">
     {
       locales.map((l) => (
         <li>
@@ -26,9 +26,13 @@ const current = stripLocale(Astro.url.pathname);
 </details>
 
 <style>
-  .lang { position: relative; }
-  summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; padding-inline: 0.75rem; border: 1px solid #eadfcd; border-radius: 999px; }
-  ul { position: absolute; inset-inline-end: 0; z-index: 10; list-style: none; margin: 0.25rem 0 0; padding: 0.5rem; background: var(--surface); border-radius: var(--radius); box-shadow: 0 6px 24px rgb(0 0 0 / 0.12); min-width: 10rem; }
-  a { display: block; padding: 0.5rem 0.75rem; text-decoration: none; color: var(--text); border-radius: 8px; }
-  a[aria-current] { background: #f1e7d6; font-weight: 600; }
+  summary {
+    min-height: 44px; min-width: 44px; padding-inline: 16px; display: flex; align-items: center; justify-content: center;
+    border-radius: 999px; border: 2px solid rgb(255 255 255 / 0.8); color: #fff; font-weight: 800; font-size: 15px;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  }
+  ul { list-style: none; margin: 0; padding: 8px; min-width: 11rem; }
+  a { display: block; padding: 10px 14px; text-decoration: none; color: var(--ink); border-radius: 12px; font-weight: 700; }
+  a:hover { background: var(--ph); color: var(--ink); }
+  a[aria-current] { background: var(--red); color: #fff; }
 </style>

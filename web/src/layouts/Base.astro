@@ -1,8 +1,11 @@
 ---
-// Layout di base. La grafica qui è provvisoria: verrà sostituita da quella fatta con Claude Design.
+// Layout di base con la grafica "Proposta E · Festa e luminarie": bianco e rosso, testata notturna
+// con le luminarie, bordo a festoni, card con ombra piena. Pensato prima per lo smartphone.
 // Usa solo proprietà CSS logiche (margin-inline, padding-block...) così l'arabo si gira da solo.
+// Le pagine possono riempire lo slot "hero" per mettere qualcosa nella testata scura.
 import { defaultLocale, htmlLang, locales, path, rtlLocales, stripLocale, type Locale } from '../i18n/config';
 import { t } from '../i18n/ui';
+import Accent from '../components/Accent.astro';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { getImpostazioni } from '../lib/content';
 import { telHref } from '../lib/format';
@@ -28,6 +31,20 @@ const nav = [
   { href: path(locale, '/luoghi-storici/'), label: tr('navPlaces') },
   { href: '#contatti', label: tr('navContact') },
 ];
+const hasHero = Astro.slots.has('hero');
+
+// Bricolage Grotesque e Playfair Display non hanno greco, arabo, cinese e giapponese:
+// per quelle lingue carichiamo anche un Noto che copre l'alfabeto (vedi le variabili --sans e --serif).
+const scriptFonts: Partial<Record<Locale, string>> = {
+  el: 'family=Noto+Sans:wght@500;700;800&family=Noto+Serif:ital,wght@1,500;1,600',
+  ar: 'family=Noto+Sans+Arabic:wght@500;700;800&family=Noto+Naskh+Arabic:wght@500;600',
+  zh: 'family=Noto+Sans+SC:wght@500;700;800&family=Noto+Serif+SC:wght@500;600',
+  ja: 'family=Noto+Sans+JP:wght@500;700;800&family=Noto+Serif+JP:wght@500;600',
+};
+const fonts = [
+  'family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Playfair+Display:ital,wght@1,500;1,600',
+  scriptFonts[locale],
+].filter(Boolean).join('&');
 ---
 
 <!doctype html>
@@ -44,72 +61,197 @@ const nav = [
     <meta property="og:title" content={fullTitle} />
     {description && <meta property="og:description" content={description} />}
     {image && <meta property="og:image" content={image} />}
-    <meta name="theme-color" content="#8a6a3b" />
+    <meta name="theme-color" content="#1e0409" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} />
   </head>
   <body>
-    <a class="skip" href="#main">Skip</a>
-    <header class="site-header">
-      <a class="brand" href={path(locale, '/')}>{tr('siteName')}</a>
-      <nav aria-label="Menu">
-        <ul>{nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
-      </nav>
-      <LanguageSwitcher locale={locale} />
-    </header>
+    <a class="skip" href="#main">{tr('skip')}</a>
+    <div class:list={['night', { 'with-hero': hasHero }]}>
+      <header class="bar wrap">
+        <a class="logo" href={path(locale, '/')} aria-label={tr('siteName')}>
+          <span>Pro<br />Loco</span>
+        </a>
+        <div class="tools">
+          <LanguageSwitcher locale={locale} />
+          <details class="menu popover">
+            <summary aria-label={tr('openMenu')}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 8h14M5 16h14" /></svg>
+            </summary>
+            <nav class="panel" aria-label="Menu">
+              <ul>{nav.map((item) => <li><a href={item.href} aria-current={item.href === path(locale, current) ? 'page' : undefined}>{item.label}</a></li>)}</ul>
+            </nav>
+          </details>
+        </div>
+      </header>
+      <slot name="hero" />
+    </div>
+    <div class="scallop" aria-hidden="true"></div>
 
-    <main id="main">
+    <main id="main" class="wrap">
       {autoTranslated && tr('autoTranslated') && <p class="notice">{tr('autoTranslated')}</p>}
       <slot />
     </main>
 
     <footer class="site-footer" id="contatti">
-      <h2>{tr('contactUs')}</h2>
-      <p>{tr('contactText')}</p>
-      <ul class="contacts">
-        {impostazioni.telefono && <li><a href={telHref(impostazioni.telefono)}>{impostazioni.telefono}</a></li>}
-        {impostazioni.email && <li><a href={`mailto:${impostazioni.email}`}>{impostazioni.email}</a></li>}
-      </ul>
-      <p class="small">© {new Date().getFullYear()} Pro Loco Presicce</p>
+      <div class="wrap">
+        <span class="bulbs light" aria-hidden="true"></span>
+        <p class="hello"><Accent text={tr('footerHello')} /></p>
+        <p class="footer-text">{tr('contactText')}</p>
+        {impostazioni.telefono && <a class="phone" href={telHref(impostazioni.telefono)}>{impostazioni.telefono.replace(/^\+39(\d{3})(\d{3})(\d+)$/, '+39 $1 $2 $3')}</a>}
+        {impostazioni.email && <a class="mail" href={`mailto:${impostazioni.email}`}>{impostazioni.email}</a>}
+        <ul class="footer-nav">{nav.slice(1, 3).map((item) => <li><a href={item.href}>{item.label}</a></li>)}</ul>
+        <p class="small">© {new Date().getFullYear()} Pro Loco Presicce</p>
+      </div>
     </footer>
+
+    <script>
+      // I menu a tendina (lingua e menu) si chiudono toccando fuori o premendo Esc,
+      // e ne resta aperto uno solo alla volta.
+      const popovers = [...document.querySelectorAll<HTMLDetailsElement>('details.popover')];
+      const closeAll = (except?: Element) => popovers.forEach((d) => d !== except && d.removeAttribute('open'));
+      popovers.forEach((d) => d.addEventListener('toggle', () => d.open && closeAll(d)));
+      document.addEventListener('click', (e) => {
+        if (!(e.target instanceof Element) || !e.target.closest('details.popover')) closeAll();
+      });
+      document.addEventListener('keydown', (e) => e.key === 'Escape' && closeAll());
+      document.querySelectorAll('.popover .panel a[href^="#"]').forEach((a) => a.addEventListener('click', () => closeAll()));
+    </script>
   </body>
 </html>
 
 <style is:global>
   :root {
-    --bg: #faf6ef;
+    --red: #c8102e;
+    --red-dark: #8a0e21;
+    --red-deep: #8e0b21;
+    --bulb: #e3233b;
+    --night: #1e0409;
+    --gold: #ffc857;
+    --light: #ffe7b0;
+    --cream: #fff8f5;
     --surface: #ffffff;
-    --text: #2b2520;
-    --muted: #6b6158;
-    --accent: #8a6a3b;
-    --accent-ink: #ffffff;
-    --radius: 14px;
-    --gap: clamp(1rem, 3vw, 1.75rem);
-    font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Arabic', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
-    color: var(--text);
-    background: var(--bg);
-    line-height: 1.6;
+    --ink: #22171a;
+    --muted: #6e5a5d;
+    --ph: #f1e9e6;
+    --gutter: 20px;
+    /* Caratteri: per greco, arabo, cinese e giapponese il browser prende i glifi dal Noto in coda. */
+    --sans: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --serif: 'Playfair Display', Georgia, serif;
+    --serif-style: italic;
+    --track: -0.02em;
+    --track-tight: -0.04em;
+    --lh-display: 0.95;
+    color: var(--ink);
+    background: var(--cream);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.5;
   }
+  :root:lang(el) {
+    --sans: 'Bricolage Grotesque', 'Noto Sans', system-ui, sans-serif;
+    --serif: 'Playfair Display', 'Noto Serif', Georgia, serif;
+  }
+  /* Arabo, cinese e giapponese non hanno corsivo e non vanno spaziati stretti. */
+  :root:lang(ar) { --sans: 'Bricolage Grotesque', 'Noto Sans Arabic', system-ui, sans-serif; --serif: 'Noto Naskh Arabic', serif; }
+  :root:lang(zh) { --sans: 'Bricolage Grotesque', 'Noto Sans SC', 'PingFang SC', sans-serif; --serif: 'Noto Serif SC', serif; }
+  :root:lang(ja) { --sans: 'Bricolage Grotesque', 'Noto Sans JP', 'Hiragino Sans', sans-serif; --serif: 'Noto Serif JP', serif; }
+  :root:is(:lang(ar), :lang(zh), :lang(ja)) { --serif-style: normal; --track: 0; --track-tight: 0; --lh-display: 1.2; }
+
   * { box-sizing: border-box; }
-  body { margin: 0; }
-  img { max-width: 100%; height: auto; display: block; border-radius: var(--radius); }
-  a { color: var(--accent); }
-  h1, h2, h3 { line-height: 1.2; }
-  main { max-width: 72rem; margin-inline: auto; padding: var(--gap); }
-  .skip { position: absolute; inset-inline-start: -999px; }
-  .skip:focus { inset-inline-start: 1rem; top: 1rem; background: var(--surface); padding: 0.5rem; }
-  .site-header { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: center; justify-content: space-between; padding: 0.75rem var(--gap); background: var(--surface); border-block-end: 1px solid #eadfcd; }
-  .brand { font-weight: 700; text-decoration: none; color: var(--text); }
-  .site-header ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; list-style: none; margin: 0; padding: 0; }
-  .site-header nav a { text-decoration: none; color: var(--text); padding-block: 0.5rem; display: inline-block; }
-  .notice { background: #f1e7d6; padding: 0.5rem 1rem; border-radius: var(--radius); color: var(--muted); font-size: 0.9rem; }
-  .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0.75rem 1.25rem; border-radius: 999px; background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600; }
-  .button.secondary { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
-  .grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); }
-  .card { background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
-  .card-body { padding: 1rem 1.25rem 1.25rem; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+  main { flex: 1; width: 100%; }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--red); }
+  a:hover { color: var(--red-dark); }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  h1, h2, h3 { line-height: 1.1; font-weight: 800; letter-spacing: var(--track-tight); margin-block: 0; }
+  h1 { font-size: clamp(2.4rem, 11vw, 4rem); line-height: var(--lh-display); }
+  .it { font-family: var(--serif); font-style: var(--serif-style); font-weight: 500; letter-spacing: -0.01em; }
+  :root:is(:lang(ar), :lang(zh), :lang(ja)) .it { letter-spacing: 0; }
+  h1 .it, h2 .it { color: var(--red); }
+
+  .wrap { width: 100%; max-width: 72rem; margin-inline: auto; padding-inline: var(--gutter); }
+  .skip { position: absolute; inset-inline-start: -999px; z-index: 30; }
+  .skip:focus { inset-inline-start: 1rem; top: 1rem; background: var(--surface); padding: 0.5rem 1rem; border-radius: 999px; }
+
+  /* Testata notturna: dal buio al rosso, con un alone caldo dove stanno le luminarie. */
+  .night {
+    position: relative; color: #fff; padding-block: 16px 22px;
+    background: radial-gradient(70% 45% at 50% 30%, rgb(255 170 90 / 0.28) 0%, rgb(255 170 90 / 0) 70%), linear-gradient(180deg, var(--night) 0%, #4a0613 40%, var(--red-deep) 100%);
+  }
+  .night:not(.with-hero) { background: linear-gradient(180deg, var(--night) 0%, #4a0613 55%, var(--red-deep) 100%); padding-block-end: 14px; }
+  .scallop { height: 22px; background: radial-gradient(circle at 11px 0, var(--red-deep) 11px, transparent 11.5px) 0 0 / 22px 22px repeat-x; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; z-index: 20; }
+  .logo {
+    display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 999px;
+    background: #fff; color: var(--red); font-size: 11px; line-height: 1.05; font-weight: 800; text-align: center; text-transform: uppercase; text-decoration: none;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  }
+  .tools { display: flex; gap: 8px; }
+  .popover { position: relative; }
+  .popover summary { list-style: none; cursor: pointer; }
+  .popover summary::-webkit-details-marker { display: none; }
+  .menu summary { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; background: #fff; color: var(--red); }
+  .popover .panel {
+    position: absolute; inset-inline-end: 0; top: calc(100% + 8px); z-index: 20;
+    background: var(--surface); border: 2px solid var(--ink); border-radius: 22px; box-shadow: 5px 5px 0 var(--red);
+  }
+  .menu .panel { min-width: 15rem; padding: 8px; }
+  .menu ul { list-style: none; margin: 0; padding: 0; }
+  .menu a { display: block; padding: 12px 16px; border-radius: 14px; color: var(--ink); text-decoration: none; font-weight: 800; font-size: 19px; letter-spacing: var(--track); }
+  .menu a:hover { background: var(--ph); color: var(--ink); }
+  .menu a[aria-current] { color: var(--red); }
+
+  /* Elementi della grafica riusati nelle pagine */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 1.25rem;
+    border-radius: 999px; font-weight: 800; font-size: 17px; text-decoration: none; text-align: center; line-height: 1.2;
+    border: 2px solid transparent;
+  }
+  .btn.primary { background: var(--red); color: #fff; }
+  .btn.primary:hover { background: var(--red-dark); color: #fff; }
+  .btn.secondary { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+  .btn.outline { border-color: var(--ink); color: var(--ink); background: var(--surface); box-shadow: 4px 4px 0 var(--red); }
+  .bulbs { display: block; height: 0; border-top: 4px dotted var(--bulb); }
+  .bulbs.light { border-top-color: var(--light); }
+  .section-title { display: flex; align-items: center; gap: 12px; }
+  .section-title h2, .section-title h1 { font-size: clamp(2rem, 8.5vw, 2.6rem); line-height: 1; }
+  .section-title .bulbs { flex: 1; min-width: 2rem; }
+  .card {
+    display: block; background: var(--surface); border: 2px solid var(--ink); border-radius: 26px; color: var(--ink); text-decoration: none;
+    box-shadow: 6px 6px 0 var(--red); transition: transform 0.15s, box-shadow 0.15s;
+  }
+  [dir='rtl'] .card { box-shadow: -6px 6px 0 var(--red); }
+  .cards { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); }
+  .cards > :nth-child(even) { box-shadow: 6px 6px 0 var(--ink); }
+  [dir='rtl'] .cards > :nth-child(even) { box-shadow: -6px 6px 0 var(--ink); }
+  a.card:hover { color: var(--ink); transform: translate(-2px, -2px); }
+  .lead { color: var(--muted); font-size: 1.1rem; margin-block: 0.5rem 0; }
+  .eyebrow { margin: 0 0 0.5rem; font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); }
+  .eyebrow a { text-decoration: none; }
+  .empty { padding: 1.25rem; border: 2px dashed var(--muted); border-radius: 22px; color: var(--muted); }
   .prose { max-width: 42rem; }
-  .site-footer { background: #2b2520; color: #f3ede4; padding: 2rem var(--gap); margin-block-start: 3rem; }
-  .site-footer a { color: #f3d9a8; }
-  .contacts { list-style: none; padding: 0; }
-  .small { font-size: 0.85rem; opacity: 0.8; }
+  .prose img { border-radius: 22px; }
+  .notice { margin-block: 1.25rem 0; padding: 0.6rem 1rem; border-radius: 16px; background: var(--ph); color: var(--muted); font-size: 0.9rem; }
+
+  main > :first-child:not(.notice), main > .notice + * { margin-block-start: 1.5rem; }
+
+  .site-footer { margin-block-start: 3.5rem; padding-block: 30px 40px; background: var(--red); color: #fff; }
+  .site-footer .wrap { display: flex; flex-direction: column; gap: 8px; }
+  .site-footer .bulbs { margin-block-end: 12px; }
+  .site-footer a { color: #ffe3e7; }
+  .hello { margin: 0; font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: var(--track-tight); }
+  .footer-text { margin: 0 0 8px; color: #ffd3d9; max-width: 34rem; }
+  .site-footer .phone { color: #fff; font-size: 22px; font-weight: 800; text-decoration: none; direction: ltr; unicode-bidi: isolate; align-self: start; }
+  .site-footer .mail { overflow-wrap: anywhere; }
+  .footer-nav { display: flex; flex-wrap: wrap; gap: 4px 18px; list-style: none; margin: 8px 0 0; padding: 0; }
+  .footer-nav a { display: inline-block; padding-block: 10px; font-weight: 700; }
+  .small { margin: 0; font-size: 14px; color: #ffd3d9; }
+
+  @media (min-width: 48rem) {
+    :root { --gutter: 32px; }
+  }
 </style>

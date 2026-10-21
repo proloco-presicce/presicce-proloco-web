@@ -1,0 +1,11 @@
+---
+// Titoli a due voci della grafica: le parti tra asterischi ("Eventi *nel borgo*") escono
+// in corsivo e in colore. Così ogni lingua sceglie da sé quale parte mettere in risalto.
+interface Props {
+  text: string;
+}
+
+const parts = Astro.props.text.split('*');
+---
+
+{parts.map((part, i) => (i % 2 ? <span class="it">{part}</span> : part))}

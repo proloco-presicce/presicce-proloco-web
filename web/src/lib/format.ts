@@ -35,3 +35,7 @@ export function calendarHref(title: string, startIso: string, endIso: string | u
   const params = new URLSearchParams({ action: 'TEMPLATE', text: title, dates: `${start}/${end}`, location });
   return `https://calendar.google.com/calendar/render?${params}`;
 }
+
+/** Giorno della settimana per esteso, per la riga sotto il titolo delle card ("domenica"). */
+export const weekday = (iso: string, locale: Locale) =>
+  new Intl.DateTimeFormat(htmlLang[locale], { timeZone: TIME_ZONE, weekday: 'long' }).format(new Date(iso));
