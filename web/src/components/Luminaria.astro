@@ -48,23 +48,63 @@ const { label } = Astro.props;
 <style>
   /* Tre colori di lampadine, alternati lungo ogni linea: bianco, verde e oro. */
   .luminaria { display: block; width: 100%; height: auto; }
-  .spente { stroke: rgb(255 231 176 / 0.22); }
+  .spente { stroke: rgb(255 231 176 / 0.14); }
   .l1 { stroke: var(--bulb-white, #fff6e0); }
-  .l2 { stroke: var(--bulb-green, #7ee08f); }
-  .l3 { stroke: var(--bulb-gold, #ffc857); }
-  /* Le lampadine si accendono e si spengono a turno, come una luminaria vera.
+  .l2 { stroke: var(--bulb-green, #3fe36b); }
+  .l3 { stroke: var(--bulb-gold, #ffb21c); }
+  /* Le lampadine si accendono e si spengono da sole, come in una luminaria vera:
+     prima corrono i tre colori uno dopo l'altro, poi si accende tutto, un lampo di buio
+     e di nuovo tutto acceso. Il giro dura 3 secondi e ricomincia.
      Chi ha chiesto meno animazioni al telefono le vede tutte accese e ferme. */
   @media (prefers-reduced-motion: no-preference) {
-    .luci { animation: accendi 2.4s steps(1, end) infinite; }
-    .l2 { animation-delay: -0.8s; }
-    .l3 { animation-delay: -1.6s; }
-    .alone { animation: respiro 4.5s ease-in-out infinite alternate; }
-    .scintille { animation: scintilla 2.6s steps(2, jump-none) infinite alternate; }
+    .l1 { animation: accendi-1 3s steps(1, end) infinite; }
+    .l2 { animation: accendi-2 3s steps(1, end) infinite; }
+    .l3 { animation: accendi-3 3s steps(1, end) infinite; }
+    .alone { animation: respiro 3s ease-in-out infinite alternate; }
+    .scintille { animation: scintilla 0.9s steps(2, jump-none) infinite alternate; }
   }
-  @keyframes accendi {
-    0%, 100% { opacity: 1; }
-    66% { opacity: 0.12; }
+  @keyframes accendi-1 {
+    0.0% { opacity: 1; }
+    8.33% { opacity: 0.08; }
+    16.67% { opacity: 0.08; }
+    25.0% { opacity: 1; }
+    33.33% { opacity: 0.08; }
+    41.67% { opacity: 0.08; }
+    50.0% { opacity: 1; }
+    58.33% { opacity: 1; }
+    66.67% { opacity: 0.08; }
+    75.0% { opacity: 1; }
+    83.33% { opacity: 1; }
+    91.67% { opacity: 1; }
   }
-  @keyframes respiro { from { opacity: 0.3; } to { opacity: 0.6; } }
-  @keyframes scintilla { from { opacity: 1; } to { opacity: 0.55; } }
+  @keyframes accendi-2 {
+    0.0% { opacity: 0.08; }
+    8.33% { opacity: 1; }
+    16.67% { opacity: 0.08; }
+    25.0% { opacity: 0.08; }
+    33.33% { opacity: 1; }
+    41.67% { opacity: 0.08; }
+    50.0% { opacity: 1; }
+    58.33% { opacity: 1; }
+    66.67% { opacity: 0.08; }
+    75.0% { opacity: 1; }
+    83.33% { opacity: 1; }
+    91.67% { opacity: 1; }
+  }
+  @keyframes accendi-3 {
+    0.0% { opacity: 0.08; }
+    8.33% { opacity: 0.08; }
+    16.67% { opacity: 1; }
+    25.0% { opacity: 0.08; }
+    33.33% { opacity: 0.08; }
+    41.67% { opacity: 1; }
+    50.0% { opacity: 1; }
+    58.33% { opacity: 1; }
+    66.67% { opacity: 0.08; }
+    75.0% { opacity: 1; }
+    83.33% { opacity: 1; }
+    91.67% { opacity: 1; }
+  }
+  @keyframes respiro { from { opacity: 0.2; } to { opacity: 0.45; } }
+  @keyframes scintilla { from { opacity: 1; } to { opacity: 0.3; } }
 </style>
