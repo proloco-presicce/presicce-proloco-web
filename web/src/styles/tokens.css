@@ -27,10 +27,10 @@
   /* ── Le luminarie: le lampadine a tre colori ── */
   --bulb: #e3233b;         /* lampadine rosse dei divisori su fondo chiaro */
   --bulb-white: #fff6e0;   /* lampadina bianca calda */
-  --bulb-green: #7ee08f;   /* lampadina verde */
-  --bulb-gold: #ffc857;    /* lampadina oro */
+  --bulb-green: #3fe36b;   /* lampadina verde */
+  --bulb-gold: #ffb21c;    /* lampadina oro */
   --bulb-glow: #ffb347;    /* alone sfocato attorno alle lampadine */
-  --gold: var(--bulb-gold);/* oro: occhielli e contorni a puntini sulla notte, focus */
+  --gold: #ffc857;         /* oro: occhielli e contorni a puntini sulla notte, focus */
   --light: #ffe7b0;        /* luce calda: titoli in corsivo e scritte sulla notte */
 
   /* ── Neutri ── */
