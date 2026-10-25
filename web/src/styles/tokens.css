@@ -1,0 +1,134 @@
+/*
+  Design system "Festa e luminarie" (proposta E) — tutte le scelte grafiche del sito in un posto solo.
+  Colori, caratteri, misure, angoli e ombre si cambiano QUI, non nei singoli componenti.
+  La guida leggibile con gli esempi: https://claude.ai/artifact/UWt36Ut3gQJjbipE99LDBg
+
+  Regole:
+  - Nei componenti si usano solo queste variabili (niente #colori o px di angoli/ombre scritti a mano).
+  - Sono ammessi valori a mano solo per misure di impaginazione (altezze di foto, larghezze di colonne).
+  - Le uniche eccezioni sono i file che non leggono il CSS: il meta theme-color in Base.astro e
+    public/manifest.webmanifest (usano --night) e il disegno Luminaria.astro (usa i colori --bulb-*).
+*/
+:root {
+  /* ── Colori del marchio: bianco e rosso della Pro Loco ── */
+  --white: #ffffff;
+  --red: #c8102e;          /* rosso Pro Loco: pulsanti, link, titoli in corsivo */
+  --red-dark: #8a0e21;     /* hover del rosso */
+  --red-wine: #a10d25;     /* fondo del bollino data, testo dei chip */
+  --red-ember: #7a0a1c;    /* fondo scuro dei riquadri rossi */
+  --red-glow: #ff4d63;     /* alone chiaro dei riquadri rossi */
+  --red-deep: #8e0b21;     /* fine della testata notturna e bordo a festoni */
+  --blush: #fde8eb;        /* fondo dei chip su bianco */
+
+  /* ── La notte della testata ── */
+  --night: #1e0409;        /* cielo: inizio della testata (anche theme-color) */
+  --night-mid: #4a0613;    /* tono di mezzo del cielo */
+
+  /* ── Le luminarie: le lampadine a tre colori ── */
+  --bulb: #e3233b;         /* lampadine rosse dei divisori su fondo chiaro */
+  --bulb-white: #fff6e0;   /* lampadina bianca calda */
+  --bulb-green: #7ee08f;   /* lampadina verde */
+  --bulb-gold: #ffc857;    /* lampadina oro */
+  --bulb-glow: #ffb347;    /* alone sfocato attorno alle lampadine */
+  --gold: var(--bulb-gold);/* oro: occhielli e contorni a puntini sulla notte, focus */
+  --light: #ffe7b0;        /* luce calda: titoli in corsivo e scritte sulla notte */
+
+  /* ── Neutri ── */
+  --cream: #fff8f5;        /* fondo pagina */
+  --surface: #ffffff;      /* fondo delle card */
+  --ink: #22171a;          /* testo, bordi delle card */
+  --muted: #6e5a5d;        /* testo secondario */
+  --ph: #f1e9e6;           /* segnaposto foto, hover delle voci di menu */
+
+  /* ── Testo su fondo scuro o rosso ── */
+  --on-dark: rgb(255 255 255 / 0.92);  /* testo corrente sulla notte e sul rosso */
+  --on-dark-line: rgb(255 255 255 / 0.8);/* bordo dei pulsanti chiari sulla notte */
+  --on-red-soft: #ffdde2;  /* occhielli e testo piccolo sul rosso (4.7:1 sul rosso) */
+  --on-red-link: #ffe3e7;  /* link sul rosso */
+
+  /* ── Sfumature ricorrenti ── */
+  --glow-warm: rgb(255 170 90 / 0.28);
+  --glow-warm-0: rgb(255 170 90 / 0);
+  --grad-night: linear-gradient(180deg, var(--night) 0%, var(--night-mid) 45%, var(--red-deep) 100%);
+  --grad-red: linear-gradient(180deg, var(--red) 0%, var(--red-ember) 100%);
+  --grad-badge: linear-gradient(180deg, var(--bulb), var(--red-wine));
+
+  /* ── Caratteri ──
+     Bricolage Grotesque per titoli, pulsanti e testo; Playfair Display corsivo per la parola in risalto.
+     Per greco, arabo, cinese e giapponese il browser prende i glifi dal Noto in coda (vedi sotto). */
+  --font-brand: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sans: var(--font-brand);
+  --serif: 'Playfair Display', Georgia, serif;
+  --serif-style: italic;
+  --track: -0.02em;
+  --track-tight: -0.04em;
+  --track-display: -0.045em;
+  --track-caps: 0.14em;
+  --lh-display: 0.95;
+
+  /* Scala dei testi (da smartphone; i titoli grandi crescono con clamp nelle pagine) */
+  --fs-caps: 13px;         /* occhielli in maiuscoletto */
+  --fs-xs: 12px;           /* chip, etichette dei riquadri */
+  --fs-sm: 15px;           /* dettagli, menu lingua */
+  --fs-body: 17px;         /* testo e pulsanti */
+  --fs-lead: 18px;         /* testo introduttivo */
+  --fs-h3: 21px;           /* titolo delle card */
+  --fs-h2: 30px;           /* titolo di sezione */
+
+  /* ── Spaziature: multipli di 4 ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --gutter: 20px;          /* margine laterale della pagina */
+  --section-gap: 44px;     /* distanza tra le sezioni */
+  --tap: 44px;             /* altezza minima di ogni cosa che si tocca */
+
+  /* ── Angoli ── */
+  --r-xs: 12px;
+  --r-sm: 16px;
+  --r-md: 22px;
+  --r-lg: 28px;
+  --r-xl: 48px;
+  --r-pill: 999px;
+
+  /* ── Ombre ──
+     L'ombra "piena" (senza sfocatura) è la firma delle card. --dir la gira da sola in arabo.
+     Uso: box-shadow: var(--hard-md) var(--red); */
+  --dir: 1;
+  --hard-sm: calc(4px * var(--dir)) 4px 0;
+  --hard-md: calc(6px * var(--dir)) 6px 0;
+  --shadow-float: 0 8px 20px rgb(0 0 0 / 0.3);   /* bollini e adesivi sopra le foto */
+  --shadow-soft: 0 6px 14px rgb(0 0 0 / 0.18);
+  --shadow-logo: 0 4px 14px rgb(0 0 0 / 0.35);
+  --shadow-bulb: 0 0 10px rgb(255 200 87 / 0.9);   /* lampadina accesa */
+
+  /* ── Motivi ── */
+  --dots: 4px dotted;      /* fila di lampadine: border-top: var(--dots) var(--bulb) */
+  --dots-thin: 3px dotted; /* contorno ad arco delle foto */
+}
+[dir='rtl'] { --dir: -1; }
+
+@media (min-width: 48rem) {
+  :root { --gutter: 32px; }
+}
+@media (min-width: 60rem) {
+  :root { --section-gap: 88px; }
+}
+
+/* Lingue con alfabeti diversi */
+:root:lang(el) {
+  --sans: 'Bricolage Grotesque', 'Noto Sans', system-ui, sans-serif;
+  --serif: 'Playfair Display', 'Noto Serif', Georgia, serif;
+}
+/* Arabo: Noto Kufi per titoli e pulsanti, Noto Naskh per il testo; il risalto è solo nel colore. */
+:root:lang(ar) { --sans: 'Bricolage Grotesque', 'Noto Kufi Arabic', system-ui, sans-serif; --serif: var(--sans); --body: 'Bricolage Grotesque', 'Noto Naskh Arabic', serif; }
+:root:lang(zh) { --sans: 'Bricolage Grotesque', 'Noto Sans SC', 'PingFang SC', sans-serif; --serif: 'Noto Serif SC', serif; }
+:root:lang(ja) { --sans: 'Bricolage Grotesque', 'Noto Sans JP', 'Hiragino Sans', sans-serif; --serif: 'Noto Serif JP', serif; }
+/* Arabo, cinese e giapponese non hanno corsivo e non vanno spaziati stretti. */
+:root:is(:lang(ar), :lang(zh), :lang(ja)) { --serif-style: normal; --track: 0; --track-tight: 0; --track-display: 0; --lh-display: 1.2; }

@@ -93,31 +93,31 @@ luoghi.push(
   .art { margin-inline: calc(var(--gutter) * -1); max-width: 34rem; }
   .copy { position: relative; display: flex; flex-direction: column; gap: 12px; padding-block-start: 18px; }
   .sticker {
-    position: absolute; inset-inline-end: -2px; top: -46px; width: 78px; height: 78px; border-radius: 999px;
+    position: absolute; inset-inline-end: -2px; top: -46px; width: 78px; height: 78px; border-radius: var(--r-pill);
     display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.05;
-    background: #fff; color: var(--red); font-weight: 800; text-decoration: none; text-transform: uppercase;
-    transform: rotate(10deg); box-shadow: 0 8px 20px rgb(0 0 0 / 0.3);
+    background: var(--white); color: var(--red); font-weight: 800; text-decoration: none; text-transform: uppercase;
+    transform: rotate(10deg); box-shadow: var(--shadow-float);
   }
   .sticker:hover { color: var(--red-dark); transform: rotate(4deg) scale(1.04); }
   .s-label { font-size: 10px; letter-spacing: 0.02em; }
   .s-day { font-size: 24px; line-height: 1; }
   .s-month { font-size: 12px; }
-  .hero h1 { font-size: clamp(3.4rem, 17vw, 5.5rem); line-height: 0.9; letter-spacing: -0.045em; }
+  .hero h1 { font-size: clamp(3.4rem, 17vw, 5.5rem); line-height: 0.9; letter-spacing: var(--track-display); }
   .hero h1 .it { display: block; margin-block-start: 8px; font-size: clamp(2.1rem, 9.6vw, 3.2rem); line-height: 1.05; color: var(--light); letter-spacing: -0.01em; }
   :global(:root:is(:lang(ar), :lang(zh), :lang(ja), :lang(el))) .hero h1 .it { font-size: clamp(1.8rem, 8vw, 2.8rem); line-height: 1.25; }
   :global(:root:is(:lang(ar), :lang(zh), :lang(ja))) .hero h1 { letter-spacing: 0; line-height: 1.1; }
-  .intro { margin: 0; font-size: 18px; line-height: 1.4; color: rgb(255 255 255 / 0.92); max-width: 34rem; }
+  .intro { margin: 0; font-size: 18px; line-height: 1.4; color: var(--on-dark); max-width: 34rem; }
   .book { margin: 0; font-size: 18px; line-height: 1.35; font-weight: 800; color: var(--gold); max-width: 34rem; }
 
   .block { display: flex; flex-direction: column; gap: 16px; margin-block-start: 44px; }
-  .more { align-self: center; font-weight: 800; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
+  .more { align-self: center; font-weight: 800; min-height: var(--tap); display: inline-flex; align-items: center; gap: 6px; }
   :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
 
   .places { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; text-align: center; }
   .places a { display: flex; flex-direction: column; gap: 8px; color: var(--ink); text-decoration: none; }
   .places a:hover .arch { border-color: var(--red-dark); }
-  .arch { padding: 4px; border: 3px dotted var(--bulb); border-radius: 999px 999px 16px 16px; }
-  .photo { display: block; height: 140px; border-radius: 999px 999px 12px 12px; overflow: hidden; background: var(--ph); }
+  .arch { padding: 4px; border: var(--dots-thin) var(--bulb); border-radius: var(--r-pill) var(--r-pill) var(--r-sm) var(--r-sm); }
+  .photo { display: block; height: 140px; border-radius: var(--r-pill) var(--r-pill) var(--r-xs) var(--r-xs); overflow: hidden; background: var(--ph); }
   .photo img { width: 100%; height: 100%; object-fit: cover; }
   .p-title { font-weight: 800; font-size: 15px; line-height: 1.2; }
   .guide { width: 100%; }
@@ -151,7 +151,7 @@ luoghi.push(
     .extra { display: block; }
     .places .photo { height: 260px; }
     .p-title { font-size: 18px; }
-    .guide { align-self: flex-start; box-shadow: 5px 5px 0 var(--red); }
+    .guide { align-self: flex-start; box-shadow: var(--hard-md) var(--red); }
   }
   /* Arabo: il risalto del titolo è solo nel colore, e il bollino va a sinistra ruotato al contrario. */
   :global([dir='rtl']) .sticker { transform: rotate(-10deg); }

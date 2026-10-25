@@ -27,12 +27,12 @@ const current = stripLocale(Astro.url.pathname);
 
 <style>
   summary {
-    min-height: 44px; min-width: 44px; padding-inline: 16px; display: flex; align-items: center; justify-content: center;
-    border-radius: 999px; border: 2px solid rgb(255 255 255 / 0.8); color: #fff; font-weight: 800; font-size: 15px;
-    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    min-height: var(--tap); min-width: 44px; padding-inline: 16px; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--r-pill); border: 2px solid var(--on-dark-line); color: var(--white); font-weight: 800; font-size: 15px;
+    font-family: var(--font-brand);
   }
   ul { list-style: none; margin: 0; padding: 8px; min-width: 11rem; }
-  a { display: block; padding: 10px 14px; text-decoration: none; color: var(--ink); border-radius: 12px; font-weight: 700; }
+  a { display: block; padding: 10px 14px; text-decoration: none; color: var(--ink); border-radius: var(--r-xs); font-weight: 700; }
   a:hover { background: var(--ph); color: var(--ink); }
-  a[aria-current] { background: var(--red); color: #fff; }
+  a[aria-current] { background: var(--red); color: var(--white); }
 </style>

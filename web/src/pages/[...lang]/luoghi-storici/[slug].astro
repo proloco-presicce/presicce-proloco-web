@@ -105,19 +105,18 @@ const cover = local ? null : imagesAll[0] ?? null;
 <style>
   .progress { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .dots { display: flex; align-items: center; gap: 7px; }
-  .dot { width: 10px; height: 10px; border-radius: 999px; background: rgb(255 231 176 / 0.28); }
-  .dot.on { width: 14px; height: 14px; background: var(--gold); box-shadow: 0 0 10px 2px rgb(255 200 87 / 0.8); }
+  .dot { width: 10px; height: 10px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--light) 28%, transparent); }
+  .dot.on { width: 14px; height: 14px; background: var(--gold); box-shadow: var(--shadow-bulb); }
   .count { font-size: 15px; font-weight: 800; color: var(--light); }
 
   .cover { margin: 0; max-width: 46rem; }
-  .cover .arch { display: block; padding: 4px; border: 3px dotted var(--bulb); border-radius: 999px 999px 24px 24px; }
-  .cover img { display: block; width: 100%; height: clamp(320px, 80vw, 520px); object-fit: cover; border-radius: 999px 999px 20px 20px; background: var(--ph); }
+  .cover .arch { display: block; padding: 4px; border: var(--dots-thin) var(--bulb); border-radius: var(--r-pill) var(--r-pill) var(--r-md) var(--r-md); }
+  .cover img { display: block; width: 100%; height: clamp(320px, 80vw, 520px); object-fit: cover; border-radius: var(--r-pill) var(--r-pill) var(--r-md) var(--r-md); background: var(--ph); }
   figcaption { color: var(--muted); font-size: 0.9rem; margin-block-start: 0.5rem; }
 
   .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-block-start: 20px; max-width: 46rem; }
-  .fact { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 20px; background: var(--surface); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--red); }
-  .fact + .fact { box-shadow: 4px 4px 0 var(--ink); }
-  :global([dir='rtl']) .fact { box-shadow: -4px 4px 0 var(--red); }
+  .fact { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: var(--r-md); background: var(--surface); border: 2px solid var(--ink); box-shadow: var(--hard-sm) var(--red); }
+  .fact + .fact { box-shadow: var(--hard-sm) var(--ink); }
   .fact span { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); font-family: var(--sans); }
   .fact b { font-size: 17px; line-height: 1.25; }
   .map { grid-column: 1 / -1; min-height: 48px; font-size: 16px; }
@@ -126,30 +125,29 @@ const cover = local ? null : imagesAll[0] ?? null;
   /* I titoli scritti nel testo ("La storia", "Curiosità"...) prendono lo stile dei titoli di sezione. */
   .story :global(h2) { display: flex; align-items: center; gap: 12px; font-size: 30px; margin-block: 1.2em 0.5em; }
   .story :global(h2:first-child) { margin-block-start: 0; }
-  .story :global(h2)::after { content: ''; flex: 1; min-width: 2rem; border-top: 4px dotted var(--bulb); }
-  .look { margin-block-start: 6px; padding: 18px; border-radius: 22px; background: var(--surface); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--red); display: flex; flex-direction: column; gap: 10px; max-width: 42rem; }
+  .story :global(h2)::after { content: ''; flex: 1; min-width: 2rem; border-top: var(--dots) var(--bulb); }
+  .look { margin-block-start: 6px; padding: 18px; border-radius: var(--r-md); background: var(--surface); border: 2px solid var(--ink); box-shadow: var(--hard-sm) var(--red); display: flex; flex-direction: column; gap: 10px; max-width: 42rem; }
   .look-title { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); font-family: var(--sans); }
   .look ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-weight: 700; }
   .look li { display: flex; gap: 12px; align-items: center; }
-  .look li::before { content: ''; flex: 0 0 12px; height: 12px; border-radius: 999px; background: var(--gold); border: 3px solid var(--red); }
+  .look li::before { content: ''; flex: 0 0 12px; height: 12px; border-radius: var(--r-pill); background: var(--gold); border: 3px solid var(--red); }
 
   .pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-block-start: 32px; max-width: 46rem; }
-  .pager a { display: flex; flex-direction: column; justify-content: center; min-height: 72px; padding: 10px 16px; border-radius: 22px; border: 2px solid var(--ink); background: var(--surface); color: var(--ink); text-decoration: none; }
-  .pager a.next { background: var(--red); color: #fff; box-shadow: 4px 4px 0 var(--ink); }
-  :global([dir='rtl']) .pager a.next { box-shadow: -4px 4px 0 var(--ink); }
+  .pager a { display: flex; flex-direction: column; justify-content: center; min-height: 72px; padding: 10px 16px; border-radius: var(--r-md); border: 2px solid var(--ink); background: var(--surface); color: var(--ink); text-decoration: none; }
+  .pager a.next { background: var(--red); color: var(--white); box-shadow: var(--hard-sm) var(--ink); }
   .p-small { font-size: 13px; font-weight: 700; color: var(--muted); }
-  .next .p-small { color: #ffd3d9; }
+  .next .p-small { color: var(--on-red-soft); }
   .p-big { font-weight: 800; line-height: 1.2; font-family: var(--sans); }
   :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
 
   .guide-cta {
-    display: flex; flex-direction: column; gap: 12px; margin: 40px calc(16px - var(--gutter)) 0; padding: 26px 22px; border-radius: 30px; color: #fff; max-width: 46rem;
-    background: radial-gradient(70% 70% at 50% 20%, rgb(255 170 90 / 0.24) 0%, rgb(255 170 90 / 0) 70%), linear-gradient(180deg, var(--night) 0%, #4a0613 45%, var(--red-deep) 100%);
-    outline: 3px dotted var(--gold); outline-offset: -10px;
+    display: flex; flex-direction: column; gap: 12px; margin: 40px calc(16px - var(--gutter)) 0; padding: 26px 22px; border-radius: var(--r-lg); color: var(--white); max-width: 46rem;
+    background: radial-gradient(70% 70% at 50% 20%, var(--glow-warm) 0%, var(--glow-warm-0) 70%), var(--grad-night);
+    outline: var(--dots-thin) var(--gold); outline-offset: -10px;
   }
   .guide-cta h2 { font-size: 28px; line-height: 1.05; letter-spacing: -0.03em; }
   .guide-cta h2 :global(.it) { color: var(--light); }
-  .guide-cta p { margin: 0; color: rgb(255 255 255 / 0.9); }
-  .guide-cta .btn { background: #fff; color: var(--red); }
+  .guide-cta p { margin: 0; color: var(--on-dark); }
+  .guide-cta .btn { background: var(--white); color: var(--red); }
   @media (min-width: 48rem) { .guide-cta { margin-inline: 0; padding: 36px; } }
 </style>

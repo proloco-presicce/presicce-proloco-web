@@ -23,7 +23,7 @@ const { images } = Astro.props;
 
 <style>
   .gallery { margin-block: 2rem; display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); }
-  img { border-radius: 22px; border: 2px solid var(--ink); width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--ph); }
+  img { border-radius: var(--r-md); border: 2px solid var(--ink); width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--ph); }
   figure { margin: 0; }
   figcaption { color: var(--muted); font-size: 0.9rem; margin-block-start: 0.4rem; }
 </style>

@@ -113,35 +113,34 @@ const featured = prossimi[0]?.immagine ? prossimi[0]._id : null;
 <style>
   .filters { display: flex; gap: 8px; overflow-x: auto; margin-inline: calc(var(--gutter) * -1); padding: 18px var(--gutter) 8px; scrollbar-width: none; }
   .pill {
-    display: flex; align-items: center; flex: 0 0 auto; min-height: 44px; padding-inline: 18px; border-radius: 999px; cursor: pointer;
+    display: flex; align-items: center; flex: 0 0 auto; min-height: var(--tap); padding-inline: 18px; border-radius: var(--r-pill); cursor: pointer;
     border: 2px solid var(--ink); background: var(--surface); color: var(--ink); font: 800 15px var(--sans); white-space: nowrap;
   }
-  .pill[aria-pressed='true'] { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 3px 3px 0 var(--ink); }
+  .pill[aria-pressed='true'] { background: var(--red); border-color: var(--red); color: var(--white); box-shadow: var(--hard-sm) var(--ink); }
   .months { display: flex; flex-direction: column; gap: 34px; margin-block-start: 22px; }
   .month { display: flex; flex-direction: column; gap: 16px; }
   .month[hidden], .item[hidden] { display: none; }
   .section-title h2 { font-size: 30px; }
   .item { display: contents; }
-  .cards > .item:nth-child(even) :global(.card) { box-shadow: 6px 6px 0 var(--ink); }
-  :global([dir='rtl']) .cards > .item:nth-child(even) :global(.card) { box-shadow: -6px 6px 0 var(--ink); }
-  .more { align-self: center; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
+  .cards > .item:nth-child(even) :global(.card) { box-shadow: var(--hard-md) var(--ink); }
+  .more { align-self: center; min-height: var(--tap); display: inline-flex; align-items: center; gap: 6px; font-weight: 800; }
   :global([dir='rtl']) .arrow { display: inline-block; transform: scaleX(-1); }
 
   .promo {
-    display: flex; flex-direction: column; gap: 8px; margin: 30px calc(16px - var(--gutter)) 0; padding: 24px 22px; border-radius: 28px;
-    color: #fff; text-decoration: none; outline: 3px dotted var(--gold); outline-offset: -10px;
-    background: radial-gradient(70% 70% at 50% 20%, rgb(255 170 90 / 0.24) 0%, rgb(255 170 90 / 0) 70%), linear-gradient(180deg, var(--night) 0%, #4a0613 45%, var(--red-deep) 100%);
+    display: flex; flex-direction: column; gap: 8px; margin: 30px calc(16px - var(--gutter)) 0; padding: 24px 22px; border-radius: var(--r-lg);
+    color: var(--white); text-decoration: none; outline: var(--dots-thin) var(--gold); outline-offset: -10px;
+    background: radial-gradient(70% 70% at 50% 20%, var(--glow-warm) 0%, var(--glow-warm-0) 70%), var(--grad-night);
   }
-  .promo:hover { color: #fff; }
-  .promo img { width: 100%; height: 150px; object-fit: cover; border-radius: 18px; }
+  .promo:hover { color: var(--white); }
+  .promo img { width: 100%; height: 150px; object-fit: cover; border-radius: var(--r-sm); }
   .promo-text { display: flex; flex-direction: column; gap: 8px; }
-  .promo-eyebrow { font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+  .promo-eyebrow { font-size: var(--fs-caps); font-weight: 800; letter-spacing: var(--track-caps); text-transform: uppercase; color: var(--gold); }
   .promo-title { font-size: 30px; line-height: 1; font-weight: 800; letter-spacing: -0.03em; font-family: var(--sans); }
   .promo-title :global(.it) { color: var(--light); }
-  .promo-intro { color: rgb(255 255 255 / 0.9); }
+  .promo-intro { color: var(--on-dark); }
   .promo-cta {
-    margin-block-start: 6px; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding-inline: 18px;
-    border-radius: 999px; background: #fff; color: var(--red); font-weight: 800; font-family: var(--sans);
+    margin-block-start: 6px; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); padding-inline: 18px;
+    border-radius: var(--r-pill); background: var(--white); color: var(--red); font-weight: 800; font-family: var(--sans);
   }
   .past { display: flex; flex-direction: column; gap: 16px; margin-block-start: 44px; opacity: 0.75; scroll-margin-top: 16px; }
 

@@ -14,8 +14,8 @@ const { title, eyebrow, intro } = Astro.props;
 
 <div class="page-hero">
   <svg class="garland" aria-hidden="true" viewBox="0 0 390 34" preserveAspectRatio="none" fill="none">
-    <path d="M-6 4Q195 44 396 4" stroke="#FFB347" stroke-width="7" stroke-linecap="round" opacity=".3" vector-effect="non-scaling-stroke" />
-    <path d="M-6 4Q195 44 396 4" stroke="#FFC857" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="0 9" vector-effect="non-scaling-stroke" />
+    <path d="M-6 4Q195 44 396 4" class="halo" stroke-width="7" stroke-linecap="round" opacity=".3" vector-effect="non-scaling-stroke" />
+    <path d="M-6 4Q195 44 396 4" class="lights" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="0 9" vector-effect="non-scaling-stroke" />
   </svg>
   <div class="wrap text">
     {eyebrow && <span class="ph-eyebrow">{eyebrow}</span>}
@@ -28,10 +28,12 @@ const { title, eyebrow, intro } = Astro.props;
 
 <style>
   .garland { display: block; width: 100%; height: 34px; margin-block-start: 6px; }
+  .halo { stroke: var(--bulb-glow); }
+  .lights { stroke: var(--bulb-gold); }
   .text { display: flex; flex-direction: column; gap: 10px; }
-  .ph-eyebrow { font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-family: var(--sans); }
-  h1 { font-size: clamp(2.9rem, 13.5vw, 4.6rem); line-height: 0.95; letter-spacing: -0.045em; max-width: 56rem; overflow-wrap: anywhere; }
+  .ph-eyebrow { font-size: var(--fs-caps); font-weight: 800; letter-spacing: var(--track-caps); text-transform: uppercase; color: var(--gold); font-family: var(--sans); }
+  h1 { font-size: clamp(2.9rem, 13.5vw, 4.6rem); line-height: 0.95; letter-spacing: var(--track-display); max-width: 56rem; overflow-wrap: anywhere; }
   h1 :global(.it) { display: block; margin-block-start: 6px; font-size: 0.78em; color: var(--light); }
   :global(:root:is(:lang(ar), :lang(zh), :lang(ja))) h1 { letter-spacing: 0; line-height: 1.25; font-size: clamp(2.3rem, 11vw, 3.8rem); }
-  .ph-intro { margin: 0; font-size: 17px; line-height: 1.4; color: rgb(255 255 255 / 0.92); max-width: 38rem; }
+  .ph-intro { margin: 0; font-size: 17px; line-height: 1.4; color: var(--on-dark); max-width: 38rem; }
 </style>
