@@ -1,8 +1,8 @@
 import { defineType } from 'sanity';
 
-// Campi multilingua. I volontari compilano solo l'italiano: le altre lingue vengono
-// riempite in automatico alla pubblicazione (web/src/pages/api/translate.ts) e restano
-// correggibili a mano. Una correzione manuale non viene più sovrascritta.
+// Campi multilingua. I volontari compilano solo l'italiano. Pagine fisse e luoghi storici sono
+// stati tradotti una volta sola (ottobre 2026) e si correggono a mano qui; gli eventi restano in
+// italiano e nelle altre lingue il sito offre la traduzione di Google.
 export const LANGUAGES = [
   { id: 'it', title: 'Italiano' },
   { id: 'en', title: 'English' },
@@ -16,7 +16,7 @@ export const LANGUAGES = [
   { id: 'ja', title: '日本語' },
 ];
 
-const fieldsets = [{ name: 'traduzioni', title: 'Traduzioni automatiche (facoltativo correggerle)', options: { collapsible: true, collapsed: true } }];
+const fieldsets = [{ name: 'traduzioni', title: 'Traduzioni (facoltative)', options: { collapsible: true, collapsed: true } }];
 
 export const stringaLocalizzata = defineType({
   name: 'stringaLocalizzata',
@@ -57,5 +57,5 @@ export const immagineConDidascalia = defineType({
   ],
 });
 
-/** Campo tecnico nascosto: lo usa la traduzione automatica per sapere cosa è già tradotto. */
+/** Campo tecnico nascosto, usato dalla vecchia traduzione automatica (tolta a ottobre 2026). */
 export const traduzioniStato = { name: 'traduzioniStato', type: 'string', hidden: true, readOnly: true } as const;
