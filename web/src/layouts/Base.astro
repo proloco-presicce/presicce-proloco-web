@@ -37,6 +37,12 @@ const nav = [
   { href: '#contatti', label: tr('navContact') },
 ];
 const hasHero = Astro.slots.has('hero');
+// Contenuti rimasti in italiano (gli eventi): si offre la traduzione gratuita di Google della
+// versione italiana della pagina. L'indirizzo vero lo completa lo script qui sotto, così il link
+// funziona su qualunque dominio (anteprima Vercel o presicceproloco.org).
+const googleLang = locale === 'zh' ? 'zh-CN' : locale;
+const italianPath = path(defaultLocale, current);
+const googleHref = `https://translate.google.com/translate?sl=it&tl=${googleLang}&u=${encodeURIComponent(new URL(italianPath, Astro.site).href)}`;
 // Da computer il menu sta tutto nella barra: Eventi, Luoghi storici, Visite guidate, Contatti.
 const desktopNav = [nav[1], nav[2], { href: `${path(locale, '/')}#visite`, label: tr('toursEyebrow') }, nav[3]];
 // Per le condivisioni sui social, se la pagina non ha una sua foto: la Chiesa Madre dall'alto.
@@ -123,7 +129,12 @@ const fonts = [
     <div class="scallop" aria-hidden="true"></div>
 
     <main id="main" class="wrap">
-      {autoTranslated && tr('autoTranslated') && <p class="notice">{tr('autoTranslated')}</p>}
+      {autoTranslated && tr('autoTranslated') && (
+        <p class="notice">
+          {tr('autoTranslated')}{' '}
+          <a class="gt" href={googleHref} data-tl={googleLang} data-path={italianPath} rel="noopener nofollow">{tr('translateGoogle')}</a>
+        </p>
+      )}
       <slot />
     </main>
 
@@ -167,6 +178,12 @@ const fonts = [
         button.setAttribute('aria-label', button.dataset.copied ?? '');
         button.classList.add('done');
       });
+
+      // "Traduci con Google": link alla versione italiana della pagina sul dominio in uso.
+      for (const a of document.querySelectorAll<HTMLAnchorElement>('a.gt')) {
+        const url = new URL(a.dataset.path ?? '/', location.origin).href;
+        a.href = `https://translate.google.com/translate?sl=it&tl=${a.dataset.tl}&u=${encodeURIComponent(url)}`;
+      }
     </script>
   </body>
 </html>
@@ -296,6 +313,7 @@ const fonts = [
   .empty { padding: 1.25rem; border: 2px dashed var(--muted); border-radius: 22px; color: var(--muted); }
   .prose { max-width: 42rem; }
   .prose img { border-radius: 22px; }
+  .notice .gt { font-weight: 700; white-space: nowrap; }
   .notice { margin-block: 1.25rem 0; padding: 0.6rem 1rem; border-radius: 16px; background: var(--ph); color: var(--muted); font-size: 0.9rem; }
 
   main > :first-child:not(.notice), main > .notice + * { margin-block-start: 1.5rem; }
